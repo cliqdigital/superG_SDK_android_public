@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+        <style>
+        html{background-color:#FFFFFF;font-family:helvetica,arial,freesans,clean,sans-serif;font-size:13px;}
+        body{background-color:#F8F8F8;border:1px solid #E9E9E9;padding:9px;}
+        h1,h2,h3,h4,h5,h6{border:0;}
+        h1{font-size:170%;border-top:4px solid #aaa;padding-top:.5em;margin-top:1.5em;}
+        h1:first-child{margin-top:0;padding-top:.25em;border-top:none;}
+        h2{font-size:150%;margin-top:1.5em;border-top:4px solid #e0e0e0;padding-top:.5em;}
+        h3{margin-top:1em;}
+        p{margin:1em 0;line-height:1.5em;}
+        a.absent{color:#a00;}
+        ul{margin:1em 0 1em 2em;}
+        ol{margin:1em 0 1em 2em;}
+        ul li,ol li,{margin-top:.5em;margin-bottom:.5em;}
+        ul ul,ul ol,ol ol,ol ul,{margin-top:0;margin-bottom:0;}
+        blockquote{margin:1em 0;border-left:5px solid #ddd;padding-left:.6em;color:#555;}
+        dt{font-weight:bold;margin-left:1em;}
+        dd{margin-left:2em;margin-bottom:1em;}
+        table{margin:1em 0;}
+        table th{border-bottom:1px solid #bbb;padding:.2em 1em;}
+        table td{border-bottom:1px solid #ddd;padding:.2em 1em;}
+        pre{margin:1em 0;font-size:12px;background-color:#eee;border:1px solid #ddd;padding:5px;line-height:1.5em;color:#444;overflow:auto;-webkit-box-shadow:rgba(0,0,0,0.07) 0 1px 2px inset;-webkit-border-radius:3px;-moz-border-radius:3px;border-radius:3px;}
+        pre::-webkit-scrollbar{height:8px;width:8px;}
+        pre::-webkit-scrollbar-track-piece{margin-bottom:10px;background-color:#e5e5e5;border-bottom-left-radius:4px 4px;border-bottom-right-radius:4px 4px;border-top-left-radius:4px 4px;border-top-right-radius:4px 4px;}
+        pre::-webkit-scrollbar-thumb:vertical{height:25px;background-color:#ccc;-webkit-border-radius:4px;-webkit-box-shadow:0 1px 1px rgba(255,255,255,1);}
+        pre::-webkit-scrollbar-thumb:horizontal{width:25px;background-color:#ccc;-webkit-border-radius:4px;}
+        pre code{padding:0;font-size:12px;background-color:#eee;border:none;}
+        code{font-size:12px;background-color:#f8f8ff;color:#444;padding:0 .2em;border:1px solid #dedede;}
+        a code,a:link code,a:visited code{color:#4183c4;}
+        img{max-width:100%;}
+        </style>
+        </head>
+        <body><h1>Thumbr SDK for Android</h1>
+
+<h2>Revision history</h2>
+
+<table>
+    <tr>
+        <td>2.0.21</td><td>
+        -Added visual SDK version to Thumbr window<br />
+        -Added Customizable Orientation<br />
+        -Added extra parameters to registration flow: default,registration,optional_registration<br />
+        -Added a counter to the 'opens' of the Thumbr SDK window<br />
+        -Let external URL's (within the SDK window) be opened in the default browser<br />
+        -Bug fix: better orientation handling in general<br />
+        -Let Thumbr server know that back end is loaded from within the SDK (via GET param (&sdk=1) + via HEADER (x-thumbr-method))<br />
+        </td>
+    </tr>
+    <tr>
+        <td>2.0.2</td><td>
+        -Updated version number to match iOS version (for better release planning)<br />
+        -Added Animated Thumbr T-button support<br />
+        -Added SDK version number to Thumbr screen<br />
+        -Bug fixes<br />
+        </td>
+    </tr>   
+    <tr>
+        <td>1.1</td><td>
+        - Added Appsflyer support
+        </td>
+    </tr>   
+    <tr>
+        <td>1.0.1</td><td>
+        - Bug fixes
+        </td>
+    </tr>   
+    <tr>
+        <td>1.0</td><td>
+        - Initital version
+        </td>
+    </tr>   
+</table>
+
+<h2>Thumbr SDK installation</h2>
+
+<h3>Step 1:</h3>
+
+<p>Unzip the SDK package and keep the directories ‘ThumbSDK’ and ‘TestApp’ OR YOUR APPLICATION within the same directory.</p>
+
+<h3>Step 2:</h3>
+
+<p>Take <strong>Vendor/AF-Android-SDK-v1.3.9.jar</strong> and add it to the lib-folder of your Android project.
+Don't forget to add it to the build path.</p>
+
+<h3>Step 3:</h3>
+
+<p>Add a reference to the Thumbr SDK library project. Follow these steps:</p>
+
+<ol>
+<li>Import the Thumbr SDK project into Eclipse</li>
+<li>In the Package Explorer, right-click YOUR project and select Properties.    </li>
+<li>In the Properties window, select the “Android” properties group at left and locate the Library properties at right.</li>
+<li>Click Add to open the Project Selection dialog.</li>
+<li>From the list of available library project, select the Thumbr SDK project and click OK.</li>
+<li>When the dialog closes, click Apply in the Properties window.</li>
+<li>Click OK to close the Properties window
+As soon as the Properties dialog closes, Eclipse rebuilds your project.</li>
+</ol>
+
+<h3>Step 4 (optional):</h3>
+
+<p>Add the TestApp project to Eclipse to understand the methods better.</p>
+
+<h3>Step 5:</h3>
+
+<p>Update your AndroidManifest.xml with at least the settings below:</p>
+
+<pre><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.yourcompany.yourgame"
+    android:versionCode="1"
+    android:versionName="1.0" &gt;
+    &lt;uses-sdk android:targetSdkVersion="16" android:minSdkVersion="9" /&gt;
+
+    &lt;uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /&gt;
+    &lt;uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /&gt;
+    &lt;uses-permission android:name="android.permission.INTERNET" /&gt;
+    &lt;uses-permission android:name="android.permission.READ_PHONE_STATE" /&gt;
+
+    &lt;application
+        android:icon="@drawable/ic_launcher"
+        android:debuggable="true"        
+        android:label="YourLabel" &gt; 
+
+        &lt;receiver android:name="com.appsflyer.MultipleInstallBroadcastReceiver" android:exported="true"&gt;
+            &lt;intent-filter&gt;
+            &lt;action android:name="com.android.vending.INSTALL_REFERRER" /&gt;
+            &lt;/intent-filter&gt;
+        &lt;/receiver&gt;
+
+         &lt;activity
+            android:name="com.yourcompany.yourgame.yourActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:screenOrientation="landscape"
+            android:label="@string/app_name" &gt;
+            &lt;intent-filter&gt;
+                &lt;action android:name="android.intent.action.MAIN" /&gt;
+                &lt;category android:name="android.intent.category.LAUNCHER" /&gt;
+            &lt;/intent-filter&gt;
+        &lt;/activity&gt;
+
+    &lt;/application&gt;
+
+&lt;/manifest&gt;
+</code></pre>
+
+<h3>Step 5:</h3>
+
+<p>Create the buttons in your layout (eg. the main screen)</p>
+
+<p>Register button (bt_re)</p>
+
+<pre><code>&lt;ImageButton android:id="@+id/bt_re" android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/thumbr_00030" /&gt;
+</code></pre>
+
+<p>Switch User button (bt_switch) :: OPTIONAL :: THIS BUTTON IS USED TO LET THE USER SWITCH TO ANOTHER USER ACCOUNT</p>
+
+<pre><code>&lt;Button android:id="@+id/bt_switch" style="?android:attr/buttonStyleSmall" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="bottom|left" android:text="Switch User" /&gt;
+</code></pre>
+
+<h3>Step 6 ACTIVITY FILE:</h3>
+
+<p>Update the <em>activity file</em>, where Thumbr will be called (usually your main activity)
+Look at the demo application to see a complete implementation</p>
+
+<pre><code>    package com.yourcompany.yourapp.youractivity;
+</code></pre>
+
+<p><strong>Import at least these libraries</strong></p>
+
+<pre><code>    import android.app.Activity;
+    import android.content.DialogInterface;
+    import android.content.DialogInterface.OnDismissListener;
+    import android.content.pm.ActivityInfo;
+    import android.graphics.drawable.AnimationDrawable;
+    import android.os.Bundle;
+    import android.os.StrictMode;
+    import android.util.Log;
+    import android.view.View;
+    import android.view.View.OnClickListener;
+    import android.widget.Button;
+    import android.widget.ImageButton;
+    import android.widget.Toast;
+    import com.appsflyer.AppsFlyerLib;
+    import com.gkxim.android.thumbsdk.FunctionThumbrSDK;
+    import com.gkxim.android.thumbsdk.utils.ProfileObject;
+</code></pre>
+
+<p><strong>Open your class and make sure to implement OnClickListener, OndismissListener</strong></p>
+
+<pre><code>    public class yourActivity extends Activity implements OnClickListener,OnDismissListener{
+
+    /*
+     * SETTINGS
+     */
+</code></pre>
+
+<p><strong>Enter your app specific settings (provided by your Thumbr Game Manager)</strong></p>
+
+<pre><code>    //APP SPECIFIC SETTINGS
+    private String sid = "com.yourcompany.yourgame";
+    private String client_id = "989598-8738744";
+
+    //DEFAULT GAME ORIENTATION (USED IN onDismiss() BELOW, TO SWITCH BACK AFTER SDK CLOSE)
+    private int gameOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
+    //TELL THE THUMBR SDK IN WHICH ORIENTATION TO OPEN
+    private int thumbrSDKOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
+    //HIDE THE CLOSE BUTTON (ONLY USE IN-SDK PLAY BUTTON)
+    private boolean showButtonClose = false;
+</code></pre>
+
+<p><strong>Add more generic settings. Normally you don't have to change these</strong></p>
+
+<pre><code>        /*
+         * OTHER, MORE GENERIC SETTINGS (LEAVE AS IS)
+         */
+        private String action = "registration";
+        private String appsFlyerKey = "9ngR4oQcH5qz7qxcFb7ftd"; 
+        private Boolean debug = false; //OPTIONALLY SWITCH TO 'true' DURING IMPLEMENTATION      
+        private String registerUrl = "http://gasp.thumbr.com/auth/authorize?";
+        private String switchUrl = "http://gasp.thumbr.com/auth/authorize?";
+        private String portalUrl = "http://m.thumbr.com?";
+
+        ///LEAVE THESE VALUES EMPTY, UNLESS YOU KNOW WHAT YOU'RE DOING 
+        private String country = "";//eg: DE or NL
+        private String locale = "";//eg: nl_NL or de_DE
+        private String appsFlyerId="";
+        private int requestedOrientation;       
+    /*
+     * END SETTINGS
+     */
+</code></pre>
+
+<p><strong>Define the 'thumbr' object</strong></p>
+
+<pre><code>    FunctionThumbrSDK thumbr;
+</code></pre>
+
+<p><strong>Modify your onCreate function</strong></p>
+
+<pre><code>    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        //Override strict mode
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
+        //IMPORT APPSFLYER
+        AppsFlyerLib.sendTracking(this,appsFlyerKey);
+        appsFlyerId = AppsFlyerLib.getAppsFlyerUID(this);
+
+        // SET VIEW FOR YOUR APPLICATION
+        super.onCreate(savedInstanceState);
+        setContentView(com.yourcompany.yourgame.homescreen);
+
+        //CREATE BUTTON LISTENERS
+        ImageButton bt=(ImageButton) findViewById(com.yourcompany.yourapp.R.id.bt_re);
+        bt.setOnClickListener(this);
+        Button bt_switch=(Button) findViewById(com.yourcompany.yourapp.R.id.bt_switch);
+        bt_switch.setOnClickListener(this);     
+
+        //CALL THE THUMBR LIBRARY
+        thumbr=new FunctionThumbrSDK(this, 2);
+        thumbr.setEnableButtonClose(showButtonClose);
+        thumbr.setToastDebug(debug);
+        thumbr.setOrientation(thumbrSDKOrientation);
+
+        /*
+         AT ANY POINT IN THE GAME, YOU CAN CHANGE THE ACTION BEHIND THE THUMBR BUTTON
+         ALL POSSIBLE VALUES:
+
+         -default (the default behaviour)
+         -registration (forced registration form)
+         -optional_registration (registration is optional. A counter will determine when the registration will be shown again)
+
+         */
+        thumbr.setAction(action);
+
+        //(OPTIONAL) AUTOMATICALLY START THE THUMBR SDK WHEN OPENING THE APPLICATION. ONLY THE FIRST TIME, IN THIS EXAMPLE
+        if(thumbr.getCount() &lt; 2){
+            thumbr.setLinkRegister(registerUrl+"response_type=token&amp;country="+country+"&amp;locale="+locale+"&amp;sid="+sid+"&amp;client_id="+client_id+"&amp;handset_id="+appsFlyerId);            
+            thumbr.buttonREGISTER();
+        }
+
+    }
+</code></pre>
+
+<p><strong>Load the animated Thumbr T-button and attach it to 'bt_re'</strong></p>
+
+<pre><code>    //LOAD AND ANIMATE THE THUMBR LOGO
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        ImageButton thumbrLogo = (ImageButton) findViewById(com.yourcompany.yourapp.R.id.bt_re);//CHANGE THIS PATH TO THE THUMBR BUTTON IN YOUR LAYOUT
+        thumbrLogo.setBackgroundResource(com.yourcompany.yourapp.R.drawable.anim_thumbr_logo);
+        AnimationDrawable thumbrLogoAnimation = (AnimationDrawable) thumbrLogo.getBackground();
+        thumbrLogoAnimation.start();    
+    }
+</code></pre>
+
+<p><strong>Catch the button clicks - make sure to use your local paths</strong> </p>
+
+<pre><code>    //CATCH BUTTON CLICKS
+    @Override
+    public void onClick(View v) {   
+        if(v.getId()==com.yourcompany.yourapp.R.id.bt_re){//CHANGE THIS PATH TO THE THUMBR BUTTON IN YOUR LAYOUT!!
+            thumbr.setLinkRegister(registerUrl+"response_type=token&amp;country="+country+"&amp;locale="+locale+"&amp;sid="+sid+"&amp;client_id="+client_id+"&amp;handset_id="+appsFlyerId);            
+            thumbr.buttonREGISTER();
+        }   
+        if(v.getId()==com.yourcompany.yourapp.R.id.bt_switch){//CHANGE THIS PATH TO THE SWITCH BUTTON IN YOUR LAYOUT!!
+            thumbr.setOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);//OPTIONALLY CHANGE THE THUMBR SDK ORIENTATION WHEN USER SWITCHES (WAR2GLORY NEEDS THIS SETTING!!!)
+            thumbr.setEnableButtonClose(true);//OPTIONALLY SHOW THE CLOSE BUTTON :: SWITCH VIEW DOES NOT HAVE "PLAY-NOW" BUTTON"
+            thumbr.setLinkSwitch(registerUrl+"response_type=token&amp;step=switchaccount&amp;country="+country+"&amp;locale="+locale+"&amp;sid="+sid+"&amp;client_id="+client_id+"&amp;handset_id="+appsFlyerId);           
+            thumbr.buttonSWITCH();
+        }           
+    }
+</code></pre>
+
+<p><strong>Add onDismiss function to handle the Thumbr SDK window close</strong></p>
+
+<pre><code>    /*
+     * THIS FUNCTION IS CALLED WHEN THE THUMBR SDK WINDOW CLOSES.
+     */
+    @Override
+    public void onDismiss(DialogInterface dialog) {
+        Log.i("ThumbrSDK","dismiss listener called this function");
+        //SET THE ORIENTATION BACK TO GAME PREFERENCE
+        setRequestedOrientation(gameOrientation);
+        //CALL THE EXAMPLE USER DATA FUNCTION
+        getUserData();
+
+        //AFTER FIRST OPEN, LET THE SDK KNOW REGISTRATION IS OPTIONAL FROM NOW ON. REGISTRATION FLOW WILL STILL BE SHOWN EVERY #N TIMES (#N = DETERMINED SERVER SIDE)
+        thumbr.setAction("optional_registration");
+    }
+</code></pre>
+
+<p><strong>This is an example function that shows which data is sent back in the user object</strong></p>
+
+<pre><code>    //EXAMPLE FUNCTION OF RETURN VALUES
+    public void getUserData(){
+        ProfileObject ojb=thumbr.didLoginUser();            
+        if(ojb!=null){
+
+            if(ojb.getmEmail() != "null"){
+                //OPTIONALLY CHANGE THE THUMBR SDK ORIENTATION AFTER USER HAS SUBSCRIBED (WAR2GLORY NEEDS THIS SETTING!!!)
+                thumbr.setOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            }
+
+            //DO SOMETHING WITH THE USER OBJECT
+            if(debug == true){Toast.makeText(this,"User ID: "+ojb.getmID(), 4000).show();}
+            Log.i("ID",ojb.getmID());
+            Log.i("UserName",ojb.getmUserName());
+            Log.i("Status",ojb.getmStatus());
+            Log.i("Email",ojb.getmEmail());
+            Log.i("Surname",ojb.getmSurname());
+            Log.i("Gender",ojb.getmGender());
+            Log.i("DOB",ojb.getmDOB());
+            Log.i("Locale",ojb.getmLocale());
+            Log.i("City",ojb.getmCity());
+            Log.i("Address",ojb.getmAddress());
+            Log.i("ZipCode",ojb.getmZipCode());
+            Log.i("NewsLetter",ojb.getmNewsLetter());
+            Log.i("FirstName",ojb.getmFirstName());
+            Log.i("Sisdn",ojb.getmSisdn());
+            Log.i("Housenr",ojb.getmHousenr());
+            Log.i("Message",ojb.getmMessage());
+            Log.i("Code",ojb.getmCode());
+            Log.i("Description",ojb.getmDesscription());
+        }else{
+            if(debug == true){Toast.makeText(this,"Not logged in yet...", 4000).show();}                
+        }
+    }
+</code></pre>
+
+<p><strong>Closing the class</strong>   </p>
+
+<pre><code>}
+</code></pre>
+</body>
+        </html>
