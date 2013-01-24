@@ -48,6 +48,7 @@ Unzip the SDK package and keep the directories ‘ThumbSDK’ and ‘TestApp’ 
 
 ### Step 2: 
 Take **Vendor/AF-Android-SDK-v1.3.9.jar** and add it to the lib-folder of your Android project.
+Don't forget to add it to the build path.
 
 ###Step 3: 
 Add a reference to the Thumbr SDK library project. Follow these steps:
