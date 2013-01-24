@@ -134,7 +134,8 @@ Switch User button (bt_switch) :: OPTIONAL :: THIS BUTTON IS USED TO LET THE USE
 	
 ### Step 6 ACTIVITY FILE:
 Update the *activity file*, where Thumbr will be called (usually your main activity)
-Look at the demo application to see a complete implementation
+Look at the demo application to see a [complete implementation](https://github.com/cliqdigital/thumbr_SDK_android_public/blob/master/Demo%20App/src/com/gkxim/tqhung/thumbr/dev_demo/ThumbrSDKTest.java) 
+
 
 		package com.yourcompany.yourapp.youractivity;
 
