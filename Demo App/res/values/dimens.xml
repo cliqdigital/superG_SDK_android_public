@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="left5">5sp</dimen>
+    <dimen name="right5">5sp</dimen>
+    <dimen name="left10">10sp</dimen>
+    <dimen name="_50sp">50sp</dimen>
+    <dimen name="_50SP">50sp</dimen>
+</resources>
