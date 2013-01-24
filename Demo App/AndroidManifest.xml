@@ -3,7 +3,7 @@
     package="com.gkxim.tqhung.thumbr"
     android:versionCode="1103000"
     android:versionName="1.1.0.3000" >
-    <uses-sdk android:targetSdkVersion="16" android:minSdkVersion="9" />
+    <uses-sdk android:targetSdkVersion="16" android:minSdkVersion="13" />
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />

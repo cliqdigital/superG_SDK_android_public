@@ -111,9 +111,22 @@ Update your AndroidManifest.xml with at least the settings below:
 ### Step 5:
 Create the buttons in your layout (eg. the main screen)
 
-Register button (bt_re)
+Register button (bt_re) (within linear layout)
 
-	<ImageButton android:id="@+id/bt_re" android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/thumbr_00030" />
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|right"
+        android:orientation="horizontal" >
+        
+        <ImageButton
+            android:layout_weight="1"
+            android:id="@+id/bt_re"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+			android:background="@drawable/thumbr_00030"                    
+             />
+    </LinearLayout>
 
 Switch User button (bt_switch) :: OPTIONAL :: THIS BUTTON IS USED TO LET THE USER SWITCH TO ANOTHER USER ACCOUNT
 
@@ -131,14 +144,18 @@ Look at the demo application to see a complete implementation
 		import android.content.DialogInterface;
 		import android.content.DialogInterface.OnDismissListener;
 		import android.content.pm.ActivityInfo;
+		import android.graphics.Point;
 		import android.graphics.drawable.AnimationDrawable;
 		import android.os.Bundle;
 		import android.os.StrictMode;
 		import android.util.Log;
+		import android.view.Display;
 		import android.view.View;
 		import android.view.View.OnClickListener;
+		import android.view.ViewGroup.LayoutParams;
 		import android.widget.Button;
 		import android.widget.ImageButton;
+		import android.widget.LinearLayout;
 		import android.widget.Toast;
 		import com.appsflyer.AppsFlyerLib;
 		import com.gkxim.android.thumbsdk.FunctionThumbrSDK;
@@ -164,6 +181,8 @@ Look at the demo application to see a complete implementation
 		private int thumbrSDKOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
 		//HIDE THE CLOSE BUTTON (ONLY USE IN-SDK PLAY BUTTON)
 		private boolean showButtonClose = false;
+		//THUMBR BUTTON WIDTH/HEIGHT, RELATIVE TO SCREEN WIDTH (MAX. 120PX)
+		private double buttonWidth = 0.2;
 
 **Add more generic settings. Normally you don't have to change these**
 		
@@ -239,14 +258,23 @@ Look at the demo application to see a complete implementation
 
 **Load the animated Thumbr T-button and attach it to 'bt_re'**
 
-		//LOAD AND ANIMATE THE THUMBR LOGO
+		//LOAD AND ANIMATE THE THUMBR LOGO :: RESIZE IT TO A PERCENTAGE OF THE SCREEN WIDTH
 		@Override
 		public void onWindowFocusChanged(boolean hasFocus) {
-			ImageButton thumbrLogo = (ImageButton) findViewById(com.yourcompany.yourapp.R.id.bt_re);//CHANGE THIS PATH TO THE THUMBR BUTTON IN YOUR LAYOUT
-			thumbrLogo.setBackgroundResource(com.yourcompany.yourapp.R.drawable.anim_thumbr_logo);
-			AnimationDrawable thumbrLogoAnimation = (AnimationDrawable) thumbrLogo.getBackground();
-			thumbrLogoAnimation.start();	
-		}
+		ImageButton thumbrLogo = (ImageButton) findViewById(com.gkxim.tqhung.thumbr.R.id.bt_re);//CHANGE THIS PATH TO THE THUMBR BUTTON IN YOUR LAYOUT
+		
+		Display display = getWindowManager().getDefaultDisplay();
+		Point size = new Point();
+		display.getSize(size);
+		int width = (int) (size.x * buttonWidth);
+		if(width > 120){width = 120;}
+		LayoutParams params =new LinearLayout.LayoutParams(width,width);		
+		thumbrLogo.setLayoutParams(params);
+
+		thumbrLogo.setBackgroundResource(com.gkxim.tqhung.thumbr.R.drawable.anim_thumbr_logo);
+		AnimationDrawable thumbrLogoAnimation = (AnimationDrawable) thumbrLogo.getBackground();
+		thumbrLogoAnimation.start();	
+	}
 
 **Catch the button clicks - make sure to use your local paths**	
 

@@ -4,14 +4,18 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
 import android.content.pm.ActivityInfo;
+import android.graphics.Point;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.appsflyer.AppsFlyerLib;
@@ -35,6 +39,8 @@ public class ThumbrSDKTest extends Activity implements OnClickListener,OnDismiss
 	private int thumbrSDKOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
 	//HIDE THE CLOSE BUTTON (ONLY USE IN-SDK PLAY BUTTON)
 	private boolean showButtonClose = false;
+	//THUMBR BUTTON WIDTH/HEIGHT, RELATIVE TO SCREEN WIDTH (MAX. 120PX)
+	private double buttonWidth = 0.15;
 	
 		/*
 		 * OTHER, MORE GENERIC SETTINGS (LEAVE AS IS)
@@ -73,6 +79,9 @@ public class ThumbrSDKTest extends Activity implements OnClickListener,OnDismiss
 		//CREATE BUTTON LISTENERS
 		ImageButton bt=(ImageButton) findViewById(com.gkxim.tqhung.thumbr.R.id.bt_re);
 		bt.setOnClickListener(this);
+		
+
+		
 		Button bt_switch=(Button) findViewById(com.gkxim.tqhung.thumbr.R.id.bt_switch);
 		bt_switch.setOnClickListener(this);		
 		
@@ -100,13 +109,22 @@ public class ThumbrSDKTest extends Activity implements OnClickListener,OnDismiss
 		
 	}
 	
-	//LOAD AND ANIMATE THE THUMBR LOGO
+	//LOAD AND ANIMATE THE THUMBR LOGO :: RESIZE IT TO A PERCENTAGE OF THE SCREEN WIDTH
 	@Override
 	public void onWindowFocusChanged(boolean hasFocus) {
 		ImageButton thumbrLogo = (ImageButton) findViewById(com.gkxim.tqhung.thumbr.R.id.bt_re);//CHANGE THIS PATH TO THE THUMBR BUTTON IN YOUR LAYOUT
+		
+		Display display = getWindowManager().getDefaultDisplay();
+		Point size = new Point();
+		display.getSize(size);
+		int width = (int) (size.x * buttonWidth);
+		if(width > 120){width = 120;}
+		LayoutParams params =new LinearLayout.LayoutParams(width,width);		
+		thumbrLogo.setLayoutParams(params);
+	
 		thumbrLogo.setBackgroundResource(com.gkxim.tqhung.thumbr.R.drawable.anim_thumbr_logo);
 		AnimationDrawable thumbrLogoAnimation = (AnimationDrawable) thumbrLogo.getBackground();
-		thumbrLogoAnimation.start();	
+		thumbrLogoAnimation.start();
 	}
 
 	//CATCH BUTTON CLICKS
