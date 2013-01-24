@@ -1,6 +1,9 @@
  package com.gkxim.android.thumbsdk.components;
- import java.util.Hashtable;
+ import java.util.HashMap;
+import java.util.Hashtable;
  import java.util.Locale;
+import java.util.Map;
+
  import com.gkxim.android.thumbsdk.FunctionThumbrSDK;
  import com.gkxim.android.thumbsdk.R;
  import com.gkxim.android.thumbsdk.utils.APIServer;
@@ -52,7 +55,7 @@
  import android.widget.RelativeLayout.LayoutParams;
  import android.widget.RelativeLayout;
  import android.widget.TextView;
- import android.widget.Toast;
+import android.widget.Toast;
 
 public class ThumbrWebViewDialog extends Dialog implements
 		android.view.View.OnClickListener {
@@ -130,8 +133,9 @@ public class ThumbrWebViewDialog extends Dialog implements
 
 		try {
 			if (mWebView != null) {
-				mWebView.loadUrl(mURL);
-				
+				Map<String, String> extraHeaders = new HashMap<String, String>();
+				  extraHeaders.put("X-Thumbr-Method", "sdk");					
+				mWebView.loadUrl(mURL,extraHeaders);
 			}
 		} catch (Exception e) {
 			// TODO: handle exception
@@ -561,10 +565,13 @@ public class ThumbrWebViewDialog extends Dialog implements
 								+ e.getMessage());
 			}
 		}
+		
+
 
 		@Override
 		public void onPageStarted(WebView view, String url, Bitmap favicon) {
-			super.onPageStarted(view, url, favicon);			
+			super.onPageStarted(view, url, favicon);	
+			
 			parserIntercept(url);
 			if(url.contains("thumbr://stop")){
 				mLoadCompleted=true;
@@ -581,7 +588,7 @@ public class ThumbrWebViewDialog extends Dialog implements
 				//Load in external browser
 				mHandler.removeCallbacks(timeOut);
 				view.stopLoading();				
-				mLoadCompleted=true;	
+				mLoadCompleted=true;
 				view.getContext().startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
 				
 				Log.i("ThumbrSDK","Url is opened in default browser");
@@ -712,5 +719,6 @@ public class ThumbrWebViewDialog extends Dialog implements
 		.putString(FunctionThumbrSDK.ACCESSTOKEN,get_AccToken()).commit();
 		return false;
 	}
+
 }
 	

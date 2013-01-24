@@ -28,6 +28,7 @@ public class ThumbrSDKTest extends Activity implements OnClickListener,OnDismiss
 	private String sid = "com.justagame.war2glory";
 	private String client_id = "989598-8738744";
 	
+	
 	//DEFAULT GAME ORIENTATION (USED IN onDismiss() BELOW, TO SWITCH BACK AFTER SDK CLOSE)
 	private int gameOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
 	//TELL THE THUMBR SDK IN WHICH ORIENTATION TO OPEN
@@ -87,9 +88,16 @@ public class ThumbrSDKTest extends Activity implements OnClickListener,OnDismiss
 	     
 	     -default (the default behaviour)
 	     -registration (forced registration form)
-	     -optional_registration (extra registration that can be used to earn more 'credits')
+	     -optional_registration (registration is optional. A counter will determine when the registration will be shown again)
 	     */
 		thumbr.setAction(action);
+		
+		//(OPTIONAL) AUTOMATICALLY START THE THUMBR SDK WHEN OPENING THE APPLICATION. ONLY THE FIRST TIME, IN THIS EXAMPLE
+		if(thumbr.getCount() < 2){
+			thumbr.setLinkRegister(registerUrl+"response_type=token&country="+country+"&locale="+locale+"&sid="+sid+"&client_id="+client_id+"&handset_id="+appsFlyerId);			
+			thumbr.buttonREGISTER();
+		}
+		
 	}
 	
 	//LOAD AND ANIMATE THE THUMBR LOGO
@@ -127,7 +135,8 @@ public class ThumbrSDKTest extends Activity implements OnClickListener,OnDismiss
 		setRequestedOrientation(gameOrientation);
 		//CALL THE EXAMPLE USER DATA FUNCTION
 		getUserData();
-		
+		//AFTER FIRST SDK OPEN/CLOSE, LET THE SDK KNOW REGISTRATION IS NOW OPTIONAL. REGISTRATION FLOW WILL STILL BE SHOWN EVERY #N TIMES
+		thumbr.setAction("optional_registration");
 	}	
 	
 	//EXAMPLE FUNCTION OF RETURN VALUES

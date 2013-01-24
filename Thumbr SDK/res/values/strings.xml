@@ -15,5 +15,5 @@
     <!--     French -->
     <string name="msg_German">Kann nicht auf Internet zu verbinden.\nBitte überprüfen Sie Ihre Verbindungseinstellungen und versuchen Sie es erneut</string>
     <string name="German">de</string>
-    <string name="versionName">2.0.2</string>    
+    <string name="versionName">2.0.21</string>    
 </resources>

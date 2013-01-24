@@ -3,6 +3,9 @@
  */
 package com.gkxim.android.thumbsdk.components;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.gkxim.android.thumbsdk.R;
 import com.gkxim.android.thumbsdk.R.id;
 import com.gkxim.android.thumbsdk.R.layout;
@@ -36,7 +39,9 @@ public class ThumbrSDKActivity extends Activity {
 			mWebView = (WebView) findViewById(R.id.tbrlay_main_webview);
 			if (mWebView != null) {
 				mWebView.getSettings().setJavaScriptEnabled(true);
-				mWebView.loadUrl(getResources().getString(R.string.homelink));
+				Map<String, String> extraHeaders = new HashMap<String, String>();
+				  extraHeaders.put("X-Thumbr-Method", "sdk");					
+				mWebView.loadUrl(getResources().getString(R.string.homelink),extraHeaders);
 			}
 			
 			
@@ -53,7 +58,9 @@ public class ThumbrSDKActivity extends Activity {
 	private class ThumbrWebViewClient extends WebViewClient {
 		@Override
 		public boolean shouldOverrideUrlLoading(WebView view, String url) {
-			view.loadUrl(url);
+			Map<String, String> extraHeaders = new HashMap<String, String>();
+			  extraHeaders.put("X-Thumbr-Method", "sdk");			
+			view.loadUrl(url,extraHeaders);
 			return true;
 		}
 	}
