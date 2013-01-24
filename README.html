@@ -150,9 +150,22 @@ As soon as the Properties dialog closes, Eclipse rebuilds your project.</li>
 
 <p>Create the buttons in your layout (eg. the main screen)</p>
 
-<p>Register button (bt_re)</p>
+<p>Register button (bt_re) (within linear layout)</p>
 
-<pre><code>&lt;ImageButton android:id="@+id/bt_re" android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/thumbr_00030" /&gt;
+<pre><code>&lt;LinearLayout
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom|right"
+    android:orientation="horizontal" &gt;
+
+    &lt;ImageButton
+        android:layout_weight="1"
+        android:id="@+id/bt_re"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/thumbr_00030"                    
+         /&gt;
+&lt;/LinearLayout&gt;
 </code></pre>
 
 <p>Switch User button (bt_switch) :: OPTIONAL :: THIS BUTTON IS USED TO LET THE USER SWITCH TO ANOTHER USER ACCOUNT</p>
@@ -174,14 +187,18 @@ Look at the demo application to see a complete implementation</p>
     import android.content.DialogInterface;
     import android.content.DialogInterface.OnDismissListener;
     import android.content.pm.ActivityInfo;
+    import android.graphics.Point;
     import android.graphics.drawable.AnimationDrawable;
     import android.os.Bundle;
     import android.os.StrictMode;
     import android.util.Log;
+    import android.view.Display;
     import android.view.View;
     import android.view.View.OnClickListener;
+    import android.view.ViewGroup.LayoutParams;
     import android.widget.Button;
     import android.widget.ImageButton;
+    import android.widget.LinearLayout;
     import android.widget.Toast;
     import com.appsflyer.AppsFlyerLib;
     import com.gkxim.android.thumbsdk.FunctionThumbrSDK;
@@ -209,6 +226,8 @@ Look at the demo application to see a complete implementation</p>
     private int thumbrSDKOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
     //HIDE THE CLOSE BUTTON (ONLY USE IN-SDK PLAY BUTTON)
     private boolean showButtonClose = false;
+    //THUMBR BUTTON WIDTH/HEIGHT, RELATIVE TO SCREEN WIDTH (MAX. 120PX)
+    private double buttonWidth = 0.2;
 </code></pre>
 
 <p><strong>Add more generic settings. Normally you don't have to change these</strong></p>
@@ -288,14 +307,23 @@ Look at the demo application to see a complete implementation</p>
 
 <p><strong>Load the animated Thumbr T-button and attach it to 'bt_re'</strong></p>
 
-<pre><code>    //LOAD AND ANIMATE THE THUMBR LOGO
+<pre><code>    //LOAD AND ANIMATE THE THUMBR LOGO :: RESIZE IT TO A PERCENTAGE OF THE SCREEN WIDTH
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
-        ImageButton thumbrLogo = (ImageButton) findViewById(com.yourcompany.yourapp.R.id.bt_re);//CHANGE THIS PATH TO THE THUMBR BUTTON IN YOUR LAYOUT
-        thumbrLogo.setBackgroundResource(com.yourcompany.yourapp.R.drawable.anim_thumbr_logo);
-        AnimationDrawable thumbrLogoAnimation = (AnimationDrawable) thumbrLogo.getBackground();
-        thumbrLogoAnimation.start();    
-    }
+    ImageButton thumbrLogo = (ImageButton) findViewById(com.gkxim.tqhung.thumbr.R.id.bt_re);//CHANGE THIS PATH TO THE THUMBR BUTTON IN YOUR LAYOUT
+
+    Display display = getWindowManager().getDefaultDisplay();
+    Point size = new Point();
+    display.getSize(size);
+    int width = (int) (size.x * buttonWidth);
+    if(width &gt; 120){width = 120;}
+    LayoutParams params =new LinearLayout.LayoutParams(width,width);        
+    thumbrLogo.setLayoutParams(params);
+
+    thumbrLogo.setBackgroundResource(com.gkxim.tqhung.thumbr.R.drawable.anim_thumbr_logo);
+    AnimationDrawable thumbrLogoAnimation = (AnimationDrawable) thumbrLogo.getBackground();
+    thumbrLogoAnimation.start();    
+}
 </code></pre>
 
 <p><strong>Catch the button clicks - make sure to use your local paths</strong> </p>
