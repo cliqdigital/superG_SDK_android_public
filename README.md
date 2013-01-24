@@ -6,7 +6,7 @@ Revision history
 <table>
 	<tr>
 		<td>2.0.21</td><td>
-		-Better Thumbr T-button resizing
+		-Better Thumbr T-button resizing<br />
 		-Added visual SDK version to Thumbr window<br />
 		-Added Customizable Orientation<br />
 		-Added extra parameters to registration flow: default,registration,optional_registration<br />
