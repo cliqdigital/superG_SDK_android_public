@@ -134,7 +134,8 @@ public class ThumbrWebViewDialog extends Dialog implements
 		try {
 			if (mWebView != null) {
 				Map<String, String> extraHeaders = new HashMap<String, String>();
-				  extraHeaders.put("X-Thumbr-Method", "sdk");					
+				  extraHeaders.put("X-Thumbr-Method", "sdk");
+				  extraHeaders.put("X-Thumbr-Version", mContext.getResources().getString(R.string.versionName));				  
 				mWebView.loadUrl(mURL,extraHeaders);
 			}
 		} catch (Exception e) {

@@ -40,7 +40,8 @@ public class ThumbrSDKActivity extends Activity {
 			if (mWebView != null) {
 				mWebView.getSettings().setJavaScriptEnabled(true);
 				Map<String, String> extraHeaders = new HashMap<String, String>();
-				  extraHeaders.put("X-Thumbr-Method", "sdk");					
+				  extraHeaders.put("X-Thumbr-Method", "sdk");
+				  extraHeaders.put("X-Thumbr-Version", getResources().getString(R.string.versionName));				  
 				mWebView.loadUrl(getResources().getString(R.string.homelink),extraHeaders);
 			}
 			
@@ -59,7 +60,8 @@ public class ThumbrSDKActivity extends Activity {
 		@Override
 		public boolean shouldOverrideUrlLoading(WebView view, String url) {
 			Map<String, String> extraHeaders = new HashMap<String, String>();
-			  extraHeaders.put("X-Thumbr-Method", "sdk");			
+			  extraHeaders.put("X-Thumbr-Method", "sdk");
+			  extraHeaders.put("X-Thumbr-Version", getResources().getString(R.string.versionName));
 			view.loadUrl(url,extraHeaders);
 			return true;
 		}

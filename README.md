@@ -14,6 +14,7 @@ Revision history
 		-Let external URL's (within the SDK window) be opened in the default browser<br />
 		-Bug fix: better orientation handling in general<br />
 		-Let Thumbr server know that back end is loaded from within the SDK (via GET param (&sdk=1) + via HEADER (x-thumbr-method))<br />
+		-Added version header (X-Thumbr-Version)<br />
 		</td>
 	</tr>
 	<tr>
