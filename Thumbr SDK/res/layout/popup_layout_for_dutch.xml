@@ -4,11 +4,13 @@
     android:layout_height="fill_parent"
     android:background="@drawable/bg"
     android:orientation="vertical" >
+
     <include
         android:id="@+id/include1"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         layout="@layout/thumbr_layout_dialog_header" />
+
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -17,34 +19,35 @@
         android:src="@drawable/label_thumb" />
 
     <ImageView
-        android:layout_gravity="center_horizontal"        
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/geen" />
-    <ImageButton
         android:layout_gravity="center_horizontal"
+        android:src="@drawable/geen" />
+
+    <ImageButton
+        android:id="@+id/button1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/button1"
+        android:layout_gravity="center_horizontal"
         android:background="@drawable/button_refresh" />
 
-<!--     <TextView -->
-<!--         android:id="@+id/textView1" -->
-<!--         android:layout_width="wrap_content" -->
-<!--         android:layout_height="wrap_content" -->
-<!--         android:layout_marginBottom="10dip" -->
-<!--         android:layout_marginLeft="10dip" -->
-<!--         android:layout_marginRight="10dip" -->
-<!--         android:gravity="center_horizontal" -->
-<!--         android:text="text" /> -->
+    <!-- <TextView -->
+    <!-- android:id="@+id/textView1" -->
+    <!-- android:layout_width="wrap_content" -->
+    <!-- android:layout_height="wrap_content" -->
+    <!-- android:layout_marginBottom="10dip" -->
+    <!-- android:layout_marginLeft="10dip" -->
+    <!-- android:layout_marginRight="10dip" -->
+    <!-- android:gravity="center_horizontal" -->
+    <!-- android:text="text" /> -->
 
-<!--     <Button -->
-<!--         android:id="@+id/button1" -->
-<!--         android:layout_width="80dip" -->
-<!--         android:layout_height="wrap_content" -->
-<!--         android:layout_gravity="center_horizontal" -->
-<!--         android:text="OK" -->
-<!--         android:textSize="10dip" /> -->
 
-	
+    <!-- <Button -->
+    <!-- android:id="@+id/button1" -->
+    <!-- android:layout_width="80dip" -->
+    <!-- android:layout_height="wrap_content" -->
+    <!-- android:layout_gravity="center_horizontal" -->
+    <!-- android:text="OK" -->
+    <!-- android:textSize="10dip" /> -->
+
 </LinearLayout>

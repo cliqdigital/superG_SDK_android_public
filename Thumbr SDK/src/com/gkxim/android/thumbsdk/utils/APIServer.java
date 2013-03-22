@@ -1,9 +1,22 @@
 package com.gkxim.android.thumbsdk.utils;
 
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.params.HttpConnectionParams;
 import org.json.JSONObject;
 
 import android.app.Activity;
 import android.content.Context;
+import android.util.Log;
 
 public class APIServer {
 	public static final String CLIENT_ID = "&client_id=";
@@ -125,5 +138,9 @@ public class APIServer {
 		String url = LinkPortal  ;
 		return url;
 	}
-
+	
+	
+	
+	
+	
 }

@@ -1,22 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:background="#ffffff" >
 
     <ImageView
+        android:id="@+id/img_loading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
         android:layout_gravity="center_vertical|center_horizontal"
+        android:adjustViewBounds="true"
+        android:background="@drawable/ajax_loader0000" />
+
+    <ImageView
         android:id="@+id/imageView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_above="@+id/img_loading"
+        android:layout_centerHorizontal="true"
         android:src="@drawable/label_thumb" />
-    <ImageView
-        android:layout_gravity="center_vertical|center_horizontal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/img_loading"
-        android:adjustViewBounds="true"
-        android:background="@drawable/ajax_loader0000" />
-	
-    
-</FrameLayout>
+
+</RelativeLayout>

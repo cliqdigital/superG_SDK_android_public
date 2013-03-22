@@ -12,7 +12,7 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:src="@drawable/thumbr" />
-
+
     <TextView
         android:id="@+id/tbrlay_toast_title"
         android:layout_width="wrap_content"
@@ -22,7 +22,8 @@
         android:layout_toRightOf="@+id/imageView1"
         android:text="@string/title"
         android:textAppearance="?android:attr/textAppearanceMedium" />
-<!-- android:layout_alignBottom="@+id/imageView1" -->
+    <!-- android:layout_alignBottom="@+id/imageView1" -->
+
     <TextView
         android:id="@+id/tbrlay_toast_message"
         android:layout_width="wrap_content"
