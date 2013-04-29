@@ -1,19 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.gkxim.tqhung.thumbr.demo"
-    android:versionCode="1103000"
-    android:versionName="1.1.0.3000" >
-    <uses-sdk android:targetSdkVersion="16" android:minSdkVersion="13" />
-
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.INTERNET" />
+    android:versionCode="2023"
+    android:versionName="2.0.23" >
+	
+	<uses-sdk android:targetSdkVersion="16" android:minSdkVersion="10" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-	
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
+    <uses-permission android:name="android.permission.WRITE_CALENDAR" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    	
+    
     <application
         android:icon="@drawable/ic_launcher"
-        android:debuggable="true"        
+        android:debuggable="true"
+        android:hardwareAccelerated="true"    
         android:label="Thumbr" > 
         <receiver android:name="com.appsflyer.MultipleInstallBroadcastReceiver" android:exported="true">
 			<intent-filter>
@@ -24,7 +35,7 @@
             android:name="com.gkxim.tqhung.thumbr.dev_demo.ThumbrSDKTest"
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:screenOrientation="portrait"
-			android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen"            
+			android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen"       
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -32,6 +43,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name="com.adgoji.mraid.adview.AdActivity"
+                  android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"/>        
     </application>
 
 </manifest>

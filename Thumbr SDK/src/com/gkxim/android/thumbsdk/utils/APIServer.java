@@ -29,9 +29,9 @@ public class APIServer {
 	public static String step_SwitchAccount = "switchaccount";
 	public static String respone = "token";
 	public static String LinkPortal = "http://mobile.thumbr.com/start/?access_token=";
-	public static String profileURL = "http://gasp.thumbr.com/api/v1/profile?access_token=";
+	public static String profileURL = "https://gasp.thumbr.com/api/v1/profile?access_token=";
 	public static Context mContext;
-//oPZiT3z3VQ-hSIbZySqSkkz1QgNrUD5Y3fsAW7hmDlM
+
 	public APIServer(Context context) {
 		mContext = context;
 		
@@ -74,6 +74,17 @@ public class APIServer {
 				if (jo.has("city")) {
 					prof.setmCity(jo.getString("city"));
 				}
+				
+				if (jo.has("income")) {
+					prof.setmIncome(jo.getString("income"));
+				}
+				if (jo.has("age")) {
+					prof.setmAge(jo.getString("age"));
+				}
+				if (jo.has("country")) {
+					prof.setmCountry(jo.getString("country"));
+				}				
+				
 				if (jo.has("address")) {
 					prof.setmAddress(jo.getString("address"));
 				}

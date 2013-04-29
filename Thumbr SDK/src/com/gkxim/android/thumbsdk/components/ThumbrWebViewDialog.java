@@ -3,13 +3,16 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Locale;
 import java.util.Map;
-
+import android.webkit.SslErrorHandler;
+import android.net.http.SslError;
 import com.gkxim.android.thumbsdk.FunctionThumbrSDK;
 import com.gkxim.android.thumbsdk.R;
 import com.gkxim.android.thumbsdk.utils.APIServer;
 import com.gkxim.android.thumbsdk.utils.ProfileObject;
 import com.gkxim.android.thumbsdk.utils.TBrLog;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -90,6 +93,26 @@ android.view.View.OnClickListener {
 	public static String ERRORMESSAGE = TBrLog.SystemErrorMessage.TYPE_4;
 	Handler mHandler = new Handler();
 
+	class MyJavaScriptInterface  
+	{ 
+
+		public String getGmailName(){
+			Account[] accounts = AccountManager.get(mContext).getAccounts();
+			String gMailAddress = "";
+			Log.i("ThumbrSDK","GET GMAIL WAS CALLED!");
+			for (Account account : accounts)
+			{
+				if(account.name.endsWith("gmail.com"))
+				{
+					gMailAddress = account.name;
+					break;
+
+				}
+			}
+			return gMailAddress;
+		}
+	}	
+	
 	private class TimeOut implements Runnable{
 		@Override
 		public void run() {
@@ -104,7 +127,7 @@ android.view.View.OnClickListener {
 								android.graphics.Color.TRANSPARENT));
 				ThumbrWebViewDialog.this
 				.setContentView(dialogTimeOut);
-				
+
 				ThumbrWebViewDialog.this.show();
 				//mHandler.postDelayed(mCloseTimeOut, CLOSE_TIMEOUT);
 
@@ -134,10 +157,12 @@ android.view.View.OnClickListener {
 
 		try {
 			if (mWebView != null) {
+
 				Map<String, String> extraHeaders = new HashMap<String, String>();
 				extraHeaders.put("X-Thumbr-Method", "sdk");
 				extraHeaders.put("X-Thumbr-Version", mContext.getResources().getString(R.string.versionName));				  
 				mWebView.loadUrl(mURL,extraHeaders);
+				
 			}
 		} catch (Exception e) {
 			// TODO: handle exception
@@ -174,13 +199,24 @@ android.view.View.OnClickListener {
 			WebSettings aWS = mWebView.getSettings();
 			aWS.setJavaScriptCanOpenWindowsAutomatically(true);
 			aWS.setJavaScriptEnabled(true);
+			MyJavaScriptInterface jsinterface = new MyJavaScriptInterface();
+			
+			mWebView.setOverScrollMode(View.OVER_SCROLL_NEVER);
+			mWebView.addJavascriptInterface(jsinterface, "ANDROID");
+			
 			CookieManager cookieManager = CookieManager.getInstance();
 			cookieManager.setAcceptCookie(true);
-			mWebView.setWebViewClient(new onWebViewClient());
+			mWebView.setWebViewClient(new onWebViewClient(){
+				@Override
+			    public void onReceivedSslError (WebView view, SslErrorHandler handler, SslError error) {
+			        handler.proceed();
+			    }				
+				
+			});
 		}
 		frameLayout = (FrameLayout)findViewById(R.id.web_fram);
 		//mHandler.postDelayed(timeOut, CONNECTION_TIMEOUT);
-		
+
 		String SDKLayout = theContext.getSharedPreferences("ThumbrSettings", Context.MODE_PRIVATE).getString("SDKLayout", "");	
 		if(SDKLayout.equals("appsilike")){		
 			Button backbutton=(Button) findViewById(R.id.bottom_close);  
@@ -208,12 +244,23 @@ android.view.View.OnClickListener {
 				aView = (RelativeLayout) getWebViewLayout(theContext, 0);
 				setContentView(aView);
 				if (mWebView != null) {
+					MyJavaScriptInterface jsinterface = new MyJavaScriptInterface();
+					mWebView.setOverScrollMode(View.OVER_SCROLL_NEVER);
+					mWebView.addJavascriptInterface(jsinterface, "ANDROID");
+					
 					WebSettings aWS = mWebView.getSettings();
 					aWS.setJavaScriptCanOpenWindowsAutomatically(true);
 					aWS.setJavaScriptEnabled(true);
 					CookieManager cookieManager = CookieManager.getInstance();
 					cookieManager.setAcceptCookie(true);
-					mWebView.setWebViewClient(new onWebViewClient());
+					mWebView.setWebViewClient(new onWebViewClient(){
+						 @Override
+						    public void onReceivedSslError (WebView view, SslErrorHandler handler, SslError error) {
+						        handler.proceed();
+						    }						
+						
+					});
+					
 					mWebView.setBackgroundColor(0x00000000);
 				}
 			}
@@ -318,6 +365,7 @@ android.view.View.OnClickListener {
 		}
 
 		mWebView = (WebView) rl.findViewById(R.id.tbrlay_dialog_webview);
+
 
 		WebSettings aWS = mWebView.getSettings();
 		aWS.setSavePassword(false);
@@ -430,7 +478,7 @@ android.view.View.OnClickListener {
 			}
 
 
-		
+
 			ImageButton bt = (ImageButton) dialog.findViewById(R.id.button1);
 			bt.setOnClickListener(this);		
 		}
@@ -455,10 +503,7 @@ android.view.View.OnClickListener {
 			super.onCreate(savedInstanceState);
 
 			requestWindowFeature(Window.FEATURE_NO_TITLE);
-			
-			
-			setContentView(R.layout.dialog_popup_layout);
-			img= (ImageView) findViewById(R.id.img_loading_popup);
+
 		}
 		public void onShow(){
 			show();
@@ -468,30 +513,13 @@ android.view.View.OnClickListener {
 		public void onWindowFocusChanged(boolean hasFocus) {
 			// TODO Auto-generated method stub
 			super.onWindowFocusChanged(hasFocus);
-			mAnimLoading = getContext().getResources().getDrawable(
-					R.drawable.anim_loading);
-			if(img != null)
-				img.setBackgroundDrawable(mAnimLoading);
-			anim = (AnimationDrawable) img.getBackground();
-			anim.start();
+
 		}
 	}
 
 	private void onCreateAnimation(){
 
-		mAnimLoading = mContext.getResources().getDrawable(
-				R.drawable.anim_loading);
-		ImageView imgv = null;
-		if(!finished)
-			imgv= (ImageView) findViewById(R.id.img_loading);
-		else
-			imgv= (ImageView) findViewById(R.id.img_loading_web);
 
-		if (imgv != null)
-			imgv.setBackgroundDrawable(mAnimLoading);
-		anim = (AnimationDrawable) imgv.getBackground();
-		anim.start();
-		mAnimationRun=true;
 	}
 
 	public void showNotNetwork(){
@@ -558,10 +586,16 @@ android.view.View.OnClickListener {
 		}
 	}
 
+
 	public class onWebViewClient extends WebViewClient {
 		@Override
 		public void onPageFinished(WebView view, String url) {
 			super.onPageFinished(view, url);
+
+			/* This call inject JavaScript into the page which just finished loading. */
+		
+			mWebView.loadUrl("javascript:(function() {" + "if(document.getElementById('gasp_profilebundle_profiletype_email').value.indexOf('mail') === -1){document.getElementById('gasp_profilebundle_profiletype_email').value =ANDROID.getGmailName();} " +  "})()");			
+
 			TBrLog.l(TBrLog.TMB_LOGTYPE_INFO, "Load url: " + url
 					+ " is completed.");
 			if(url_Before.equals(url))
@@ -603,7 +637,7 @@ android.view.View.OnClickListener {
 		@Override
 		public void onPageStarted(WebView view, String url, Bitmap favicon) {
 			super.onPageStarted(view, url, favicon);	
-
+			
 			parserIntercept(url);
 			if(url.contains("thumbr://stop")){
 				mLoadCompleted=true;
@@ -616,7 +650,7 @@ android.view.View.OnClickListener {
 						"Start Game");
 				ThumbrWebViewDialog.this.dismiss();
 				return;
-			}else if((!url.contains("file://") && !url.contains(".colo") && !url.contains("scoreoid") && !url.contains("demooij.it") && !url.contains("thumbr.com") && !url.contains("cliqdigital.com")) || url.contains("openinbrowser")){
+			}else if((!url.contains("10.100.101") && !url.contains("file://") && !url.contains(".colo") && !url.contains("appsdorado") && !url.contains("scoreoid") && !url.contains("appsilike.mobi") && !url.equals("null") && !url.contains("demooij.it") && !url.contains("thumbr.com") && !url.contains("cliqdigital.com")) || url.contains("openinbrowser")){
 				//Load in external browser
 				mHandler.removeCallbacks(timeOut);
 				view.stopLoading();				
@@ -625,7 +659,7 @@ android.view.View.OnClickListener {
 
 				Log.i("ThumbrSDK","Url is opened in default browser");
 
-				//ThumbrWebViewDialog.this.dismiss();				
+				//ThumbrWebViewDialog.this.dismiss();	
 				return;
 			}
 			if(mWebView.isShown()){
@@ -641,11 +675,11 @@ android.view.View.OnClickListener {
 				if (isNetwork) {
 					if(finished == false){
 						if(SDKLayout.equals("appsilike")){
-						ThumbrWebViewDialog.this.setContentView(R.layout.appsilike_loading_layout);
+							ThumbrWebViewDialog.this.setContentView(R.layout.appsilike_loading_layout);
 						}
 						else
 						{
-						ThumbrWebViewDialog.this.setContentView(R.layout.loading_layout);							
+							ThumbrWebViewDialog.this.setContentView(R.layout.loading_layout);							
 						}
 					}
 					else{
@@ -691,13 +725,13 @@ android.view.View.OnClickListener {
 				dialog.dismiss();
 			}
 		}
-			
-			if(v.getId()==R.id.bottom_close){			
-				ThumbrWebViewDialog.this.dismiss();
-				Log.i("ThumbrSDK","clicked the back button");
-			}		
-	
-		
+
+		if(v.getId()==R.id.bottom_close){			
+			ThumbrWebViewDialog.this.dismiss();
+			Log.i("ThumbrSDK","clicked the back button");
+		}		
+
+
 	}
 
 
@@ -764,4 +798,7 @@ android.view.View.OnClickListener {
 		return false;
 	}
 
+
+	
 }
+

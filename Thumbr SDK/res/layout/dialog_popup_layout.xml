@@ -5,12 +5,12 @@
     android:background="#ffffff"
     android:orientation="vertical" >
 
-    <ImageView
+    <ProgressBar
         android:id="@+id/img_loading_popup"
+        style="?android:attr/progressBarStyleLarge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical|center_horizontal"
-        android:adjustViewBounds="true"
-        android:background="@drawable/ajax_loader0000" />
+        android:adjustViewBounds="true" />
 
 </FrameLayout>

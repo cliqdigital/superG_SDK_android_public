@@ -1,13 +1,16 @@
 package com.gkxim.android.thumbsdk;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -18,8 +21,10 @@ import java.util.TreeMap;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
@@ -29,6 +34,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.xmlpull.v1.XmlPullParser;
 
+import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -36,18 +42,25 @@ import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.content.pm.ActivityInfo;
 import android.content.res.AssetManager;
-import android.content.res.Configuration;
 import android.content.res.XmlResourceParser;
+import android.graphics.Color;
+import android.graphics.Point;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.util.DisplayMetrics;
+import android.os.Handler;
+import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.Display;
+import android.view.WindowManager;
 import android.webkit.CookieManager;
-import android.widget.Button;
+import android.widget.RelativeLayout;
 
+import com.MadsAdView.MadsAdView;
+import com.adgoji.mraid.adview.AdExpandListener;
+import com.adgoji.mraid.adview.AdView;
+import com.adgoji.mraid.adview.AdViewCore;
 import com.gkxim.android.thumbsdk.components.ThumbrWebViewDialog;
 import com.gkxim.android.thumbsdk.utils.APIServer;
 import com.gkxim.android.thumbsdk.utils.ProfileObject;
@@ -58,9 +71,10 @@ import com.gkxim.android.thumbsdk.utils.WSStateCode;
 import com.gkxim.android.thumbsdk.utils.WSSwitchListener;
 
 
+
 public class FunctionThumbrSDK {
 
-	private Context mContext;
+	private static Context mContext;
 	private WSLoginListener loginListener=null;	
 	private WSRegisterListener registerListener=null;
 	private WSSwitchListener switchListener=null;
@@ -88,6 +102,7 @@ public class FunctionThumbrSDK {
 
 	private OnScoreSavedListener onScoreSavedListener;
 	private String SDKLayout;
+	protected MadsAdView adView;
 
 	public interface OnScoreSavedListener {
 		public void onScoreSaved(List<NameValuePair> returnlist);
@@ -118,11 +133,15 @@ public class FunctionThumbrSDK {
 		mGameId = TBrLog.createGameID((Activity) mContext);
 		IntentFilter intentFilter = new IntentFilter();
 		intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-		context.registerReceiver(new NetworkStateReceiver(), intentFilter);
+		context.registerReceiver(new NetworkState(), intentFilter);
 		initScores();
-		
-		
+		if(isOnline()){
+			getAdSettings();
+		}
+		Log.i("ThumbrSDK", "Thumbr initialized");
 	}
+
+
 
 	public void setEnableButtonClose(boolean flag) {
 		isShowbutonClose = flag;
@@ -153,23 +172,23 @@ public class FunctionThumbrSDK {
 
 	public void buttonREGISTER() {
 		Log.i("ThumbrSDK","Register button clicked");
-		if (!isLogined()) {
-
-
-			if(registerListener!=null)
-			{				
-				registerListener.callback(WSStateCode.FAILED,null, "Connection failed");
-				Log.i("ThumbrSDK","Existing login failed, going into registration mode");
-			}
-			ShowDialog(linkRegister);
-		} else {
-			if(registerListener!=null)
-			{							
-				registerListener.callback(WSStateCode.SUCCESS,mContext.getSharedPreferences(FunctionThumbrSDK.ACCESSTOKEN,Context.MODE_PRIVATE).getString(FunctionThumbrSDK.ACCESSTOKEN,""), "LoginSuccess");
-				Log.i("ThumbrSDK","Logged in successful with accestoken" + FunctionThumbrSDK.ACCESSTOKEN);
-			}
-			buttonPORTAL();
-		}
+		//		if (!isLogined()) {
+		//
+		//
+		//			if(registerListener!=null)
+		//			{				
+		//				registerListener.callback(WSStateCode.FAILED,null, "Connection failed");
+		//				Log.i("ThumbrSDK","Existing login failed, going into registration mode");
+		//			}
+		ShowDialog(linkRegister);
+		//		} else {
+		//			if(registerListener!=null)
+		//			{							
+		//				registerListener.callback(WSStateCode.SUCCESS,mContext.getSharedPreferences(FunctionThumbrSDK.ACCESSTOKEN,Context.MODE_PRIVATE).getString(FunctionThumbrSDK.ACCESSTOKEN,""), "LoginSuccess");
+		//				Log.i("ThumbrSDK","Logged in successful with accestoken" + FunctionThumbrSDK.ACCESSTOKEN);
+		//			}
+		//			buttonPORTAL();
+		//		}
 	}
 
 	public void buttonSWITCH() {
@@ -230,17 +249,17 @@ public class FunctionThumbrSDK {
 
 		//attach action to link
 		link = link + "&action=" + this.getAction() + "&sdk=1&count=" + getCount();
-		
+
 		mContext.getSharedPreferences("ThumbrSettings", Context.MODE_PRIVATE).edit().putString("SDKLayout", getLayout()).commit();
-		
+
 		mDialog = new ThumbrWebViewDialog(mContext, isShowbutonClose);
 		mDialog.setOnDismissListener((OnDismissListener) mContext);
 		mDialog.setURL(link);// mContext.getResources().getString(R.string.Loginlink));
 		mDialog.show();
-		
+
 		//SET THE REQUESTED ORIENTATION
 		((Activity) mContext).setRequestedOrientation(requestedOrientation);
-		
+
 	}
 
 
@@ -296,7 +315,7 @@ public class FunctionThumbrSDK {
 		}
 	}
 
-	private class NetworkStateReceiver extends BroadcastReceiver {
+	public class NetworkState extends BroadcastReceiver {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			TBrLog.l(TBrLog.TMB_LOGTYPE_INFO, "Network connectivity change");
@@ -306,12 +325,14 @@ public class FunctionThumbrSDK {
 				if (ni != null && ni.getState() == NetworkInfo.State.CONNECTED) {
 					TBrLog.l(TBrLog.TMB_LOGTYPE_INFO,
 							"Network " + ni.getTypeName() + " connected");
+					mContext.getSharedPreferences("ThumbrSettings",Context.MODE_PRIVATE).edit().putBoolean("isOnline", true).commit();
 				}
 			}
 			if (intent.getExtras().getBoolean(
 					ConnectivityManager.EXTRA_NO_CONNECTIVITY, Boolean.FALSE)) {
 				TBrLog.l(TBrLog.TMB_LOGTYPE_INFO,
 						"There's no network connectivity");
+				mContext.getSharedPreferences("ThumbrSettings",Context.MODE_PRIVATE).edit().putBoolean("isOnline", false).commit();
 				if (mDialog != null && mDialog.isShowing()) {
 					mDialog.showNotNetwork();
 				}
@@ -350,18 +371,18 @@ public class FunctionThumbrSDK {
 	public String getLinkSwitch() {
 		return linkSwitch;
 	}
-	
+
 	public void setLayout(String SDKLayout){
 		this.SDKLayout = SDKLayout;
 	}
-	
+
 	public String getLayout(){
 		if(SDKLayout.equals("")){
 			SDKLayout = "thumbr";
 		}
 		return SDKLayout;
 	}
-	
+
 	/**
 	 * 
 	 * @param b
@@ -380,30 +401,17 @@ public class FunctionThumbrSDK {
 	}
 
 	private static boolean isTabletDevice(Context activityContext) {
-		// Verifies if the Generalized Size of the device is XLARGE to be
-		// considered a Tablet
-		boolean xlarge = ((activityContext.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == SIZE_XLARGE & Configuration.SCREENLAYOUT_SIZE_LARGE >= 4);
-
-		// If XLarge, checks if the Generalized Density is at least MDPI
-		// (160dpi)
-		if (xlarge) {
-			DisplayMetrics metrics = new DisplayMetrics();
-			Activity activity = (Activity) activityContext;
-			activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
-
-			// MDPI=160, DEFAULT=160, DENSITY_HIGH=240, DENSITY_MEDIUM=160,
-			// DENSITY_TV=213, DENSITY_XHIGH=320
-			if (metrics.densityDpi == DisplayMetrics.DENSITY_DEFAULT
-					|| metrics.densityDpi == DisplayMetrics.DENSITY_HIGH
-					//					|| metrics.densityDpi == DisplayMetrics.DENSITY_XXHIGH
-					|| metrics.densityDpi == Density_TV
-					|| metrics.densityDpi == Density_XHIGH) {
-
-				// Yes, this is a tablet!
-				return true;
-			}
+		TelephonyManager manager = (TelephonyManager)mContext.getSystemService(Context.TELEPHONY_SERVICE);
+		WindowManager wm = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
+		Display display = wm.getDefaultDisplay();
+		Point size = new Point();
+		display.getSize(size);		
+		if (manager.getPhoneType() == TelephonyManager.PHONE_TYPE_NONE && size.x >= 728 ) {
+			// Yes, this is a tablet!
+			//	Log.i("MRAID","I'm a tablet, I'm a tablet!!");
+			return true;
 		}
-
+		//Log.i("MRAID","I'm a phone, I'm a phone!!");
 		// No, this is not a tablet!
 		return false;
 	}
@@ -464,12 +472,12 @@ public class FunctionThumbrSDK {
 
 
 
-			if((obj.getmID() != "" && obj.getmUserName()!="") 
-					&& (gamesettings.getString("userCreated", "") == "" || gamesettings.getString("userCreated", "") != obj.getmUserName()) ){
-
-				Log.i("ThumbrSDK","Creating player (score api)");
-				this.createPlayer();
-			}		
+//			if((obj.getmID() != "" && obj.getmUserName()!="") 
+//					&& (gamesettings.getString("userCreated", "") == "" || gamesettings.getString("userCreated", "") != obj.getmUserName()) ){
+//
+//				Log.i("ThumbrSDK","Creating player (score api)");
+//				this.createPlayer();
+//			}		
 		}
 
 		return obj;
@@ -483,7 +491,7 @@ public class FunctionThumbrSDK {
 
 	private void send (Map<String, String> params, String method) {
 		SharedPreferences gamesettings = mContext.getSharedPreferences("ThumbrScoreSettings", Context.MODE_PRIVATE);        
-		
+
 		//LOCAL STORAGE
 		if(method.equals("editPlayer") || method.equals("updatePlayerField") || method.equals("createScore")){
 			Map<String, String> map = params;
@@ -493,7 +501,7 @@ public class FunctionThumbrSDK {
 					String newkey = "";
 					String key = entry.getKey().toString();
 					String value = entry.getValue().toString();
-					
+
 					if(key.equals("bonus")){newkey="assets:bonus_value";}
 					else if(key.equals("gold")){newkey="assets:gold_value";}
 					else if(key.equals("money")){newkey="assets:money_value";}
@@ -506,7 +514,7 @@ public class FunctionThumbrSDK {
 					try{
 						if(newkey.equals("")==false){
 							Log.i("ThumbrSDK","newkey: "+newkey);
-					gamesettings.edit().putString(newkey, value).commit();
+							gamesettings.edit().putString(newkey, value).commit();
 						}
 					}catch(Exception e){
 						Log.i("ThumbrSDK","Error storing locally");
@@ -838,7 +846,7 @@ public class FunctionThumbrSDK {
 
 			else if(k.contains("assets:") && k.contains("_value")){
 				String id=k.replace("assets:","").replace("_value","");
-				
+
 				if(id.equals("bonus")){query+="ab="+v+"&";}
 				if(id.equals("gold")){query+="ag="+v+"&";}
 				if(id.equals("money")){query+="am="+v+"&";}
@@ -1262,5 +1270,460 @@ public class FunctionThumbrSDK {
 		return "";
 	}	
 
+	public void adInit(){
+		MadsAdView.init(mContext);
+	}
 
+	public void pause(){
+		Log.i("MRAID","Putting ads to sleep");
+		MadsAdView.sleepSession();
+	}
+
+	public void resume(){
+		Log.i("MRAID","Resuming ads");		
+		MadsAdView.resume();
+	}
+
+	public boolean isOnline() {
+		ConnectivityManager cm =
+				(ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo netInfo = cm.getActiveNetworkInfo();
+		if (netInfo != null && netInfo.isConnectedOrConnecting() && mContext.getSharedPreferences("ThumbrSettings",Context.MODE_PRIVATE).getBoolean("isOnline",false) == true) {
+			return true;
+		}
+		return false;
+	}
+
+
+	public void getAdSettings() {
+		try {
+			SharedPreferences settings = mContext.getSharedPreferences("ThumbrSettings", Context.MODE_PRIVATE);
+			String sid = settings.getString("sid","");
+			String url = "http://ads.thumbr.com/adserver/?getAdSettings=1&debug=0&sid="+sid;
+
+			 try {
+		            // defaultHttpClient
+		            DefaultHttpClient httpClient = new DefaultHttpClient();
+		            HttpGet httpGet = new HttpGet(url);
+
+		            HttpResponse httpResponse = httpClient.execute(httpGet);
+		            HttpEntity httpEntity = httpResponse.getEntity();
+		            InputStream is = httpEntity.getContent();           
+
+		            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+		            try {
+		                String line;
+		                line = reader.readLine();
+		                     String[] RowData = line.split(",");
+		 					settings.edit().putInt("updateTimeIntervalOverride", Integer.parseInt(RowData[0])).commit();
+		                      Log.i("THUMBR","UPDATE TIME INTERVAL: "+RowData[0]);
+		                }
+		            catch (IOException ex) {
+		                // handle exception
+		            }
+		            finally {
+		                try {
+		                    is.close();
+		                }
+		                catch (IOException e) {
+		                    // handle exception
+		                }
+		            }		            
+		            
+		        } catch (UnsupportedEncodingException e) {
+		            e.printStackTrace();
+		        } catch (ClientProtocolException e) {
+		            e.printStackTrace();
+		        } catch (IOException e) {
+		            e.printStackTrace();
+		        }			
+		} catch (Exception e) {
+			Log.i("THUMBR","Cannot update Ads time interval: "+e);
+		}
+	}
+
+
+	public String getAdSetting(String adType,String dataType){
+		SharedPreferences settings = mContext.getSharedPreferences("ThumbrSettings", Context.MODE_PRIVATE);
+		if(dataType == "secret" || dataType == "zoneid"){
+			if(isTabletDevice(mContext)==true){
+				if(adType =="inline"){
+					return settings.getString("tablet_Inline_"+dataType,"");
+				}
+				else if(adType == "overlay"){
+					return settings.getString("tablet_Overlay_"+dataType,"");				
+				}
+				else if(adType == "interstitial"){
+					return settings.getString("tablet_Interstitial_"+dataType,"");
+				}
+			}
+			else{
+				if(adType =="inline"){
+					return settings.getString("phone_Inline_"+dataType,"");
+				}
+				else if(adType == "overlay"){
+					return settings.getString("phone_Overlay_"+dataType,"");
+				}
+				else if(adType == "interstitial"){
+					return settings.getString("phone_Interstitial_"+dataType,"");
+				}			
+			}
+		}
+		return "";
+	}
+
+	public void adInterstitial(final RelativeLayout ad_view){
+
+		SharedPreferences settings = mContext.getSharedPreferences("ThumbrSettings", Context.MODE_PRIVATE);
+
+		final MadsAdView adView = new MadsAdView(mContext, getAdSetting("interstitial","secret"), getAdSetting("interstitial","zoneid"));
+		adView.setAdserverURL("http://ads.thumbr.com/adserver/");
+		adView.setBackgroundColor(Color.TRANSPARENT);
+		adView.setId(1);
+		adView.setInternalBrowser(true);
+		adView.setContentAlignment(true);
+		adView.setLocationDetection(true);
+		adView.setMadsAdType("interstitial");
+		adView.setUpdateTime(0);
+		adView.setAutoCloseInterstitialTime(settings.getInt("autocloseInterstitialTime",600));
+		adView.setShowCloseButtonTime(settings.getInt("showCloseButtonTime",6));
+		adView.setEnableExpandInActivity(true);
+		ProfileObject user=didLoginUser();
+		if(user!=null){
+			adView.setZip(user.getmZipCode());
+			adView.setGender(user.getmGender());
+			adView.setAge(Integer.parseInt(user.getmAge()));
+			adView.setCity(user.getmCity());
+			adView.setCountry(user.getmCountry());
+			adView.setIncome(user.getmIncome());
+			Hashtable<String, Object> map = new Hashtable<String,Object>();
+			map.put("id",user.getmID());	
+			map.put("sid",settings.getString("sid",""));
+			map.put("client_id",settings.getString("client_id",""));
+			adView.setCustomParameters(map);
+		}		
+		if(isOnline()){
+			adView.update();
+		}
+		else{return;}
+
+		WindowManager wm = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
+		Display display = wm.getDefaultDisplay();
+		Point size = new Point();
+		display.getSize(size);
+		int adHeight = size.y;
+		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) ad_view.getLayoutParams();
+		params.height = adHeight;
+		ad_view.setLayoutParams(params);
+
+		ad_view.addView(adView);
+		adView.setAdExpandListener(new AdExpandListener() {
+			@Override
+			public void onExpand() {
+				ad_view.setBackgroundColor(Color.BLACK);
+			}
+			@Override
+			public void onClose() {
+				ad_view.setBackgroundColor(Color.TRANSPARENT);
+				RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) ad_view.getLayoutParams();
+				params.height = 0;
+				ad_view.setLayoutParams(params);
+			}
+		});
+	}
+
+	public void adOverlay(final RelativeLayout ad_view){
+		//ad_view.removeAllViews();
+
+		SharedPreferences settings = mContext.getSharedPreferences("ThumbrSettings", Context.MODE_PRIVATE);
+
+		final MadsAdView adView = new MadsAdView(mContext, getAdSetting("overlay","secret"), getAdSetting("overlay","zoneid"));
+		adView.setAdserverURL("http://ads.thumbr.com/adserver/");
+		adView.setBackgroundColor(Color.TRANSPARENT);
+		adView.setId(1);
+		adView.setInternalBrowser(true);
+		adView.setContentAlignment(true);
+		adView.setLocationDetection(true);
+		adView.setMadsAdType("overlay");
+		adView.setUpdateTime(0);
+		adView.setAutoCloseInterstitialTime(settings.getInt("autocloseInterstitialTime",600));
+		adView.setShowCloseButtonTime(settings.getInt("showCloseButtonTime",6));
+		adView.setEnableExpandInActivity(true);
+		ProfileObject user=didLoginUser();
+		if(user!=null){
+			adView.setZip(user.getmZipCode());
+			adView.setGender(user.getmGender());
+			adView.setAge(Integer.parseInt(user.getmAge()));
+			adView.setCity(user.getmCity());
+			adView.setCountry(user.getmCountry());
+			adView.setIncome(user.getmIncome());
+			Hashtable<String, Object> map = new Hashtable<String,Object>();
+			map.put("id",user.getmID());			
+			map.put("sid",settings.getString("sid",""));
+			map.put("client_id",settings.getString("client_id",""));
+			adView.setCustomParameters(map);
+		}		
+		if(isOnline()){
+			adView.update();
+		}
+		else{
+			return;}
+
+		adView.setAdExpandListener(new AdExpandListener() {
+			@Override
+			public void onExpand() {
+
+			}
+			@Override
+			public void onClose() {
+
+			}
+		});
+	}
+
+	public void adInline(final RelativeLayout ad_view)
+	{
+		ad_view.removeAllViews();		
+		SharedPreferences settings = mContext.getSharedPreferences("ThumbrSettings", Context.MODE_PRIVATE);
+
+		if(isOnline()){
+			getAdSettings();
+		}
+
+		final MadsAdView adView = new MadsAdView(mContext, getAdSetting("inline","secret"), getAdSetting("inline","zoneid"));
+		adView.setAdserverURL("http://ads.thumbr.com/adserver/");
+		adView.setBackgroundColor(Color.TRANSPARENT);
+		adView.setId(1);
+		adView.setInternalBrowser(true);
+		adView.setContentAlignment(true);
+		adView.setLocationDetection(true);
+		adView.setMadsAdType("inline");
+		if( settings.getInt("updateTimeIntervalOverride",0) >= 0 ){
+			adView.setUpdateTime(settings.getInt("updateTimeIntervalOverride",0));
+			Log.i("ThumbrSDK","update Time Interval Override is used: "+settings.getInt("updateTimeIntervalOverride",0));
+		}else{
+			adView.setUpdateTime(settings.getInt("updateTimeInterval",0));
+		}
+		adView.setAutoCloseInterstitialTime(settings.getInt("autocloseInterstitialTime",600));
+		adView.setShowCloseButtonTime(settings.getInt("showCloseButtonTime",6));
+		adView.setEnableExpandInActivity(true);
+
+		ProfileObject user=didLoginUser();
+		if(user!=null){
+			try{
+			adView.setZip(user.getmZipCode());
+			adView.setGender(user.getmGender());
+			if(user.getmAge() != ""){
+			adView.setAge(Integer.parseInt(user.getmAge()));
+			}
+			adView.setCity(user.getmCity());
+			adView.setCountry(user.getmCountry());
+			adView.setIncome(user.getmIncome());
+			Hashtable<String, Object> map = new Hashtable<String,Object>();
+			map.put("id",user.getmID());
+			map.put("sid",settings.getString("sid",""));
+			map.put("client_id",settings.getString("client_id",""));
+			adView.setCustomParameters(map);
+			}
+			catch (Exception e) {
+				// TODO: handle exception
+			}
+		}
+		if(isOnline()){
+			adView.update();
+		}
+		else{
+			return;}
+
+		RelativeLayout rl = new RelativeLayout(mContext);
+		RelativeLayout.LayoutParams lay = new RelativeLayout.LayoutParams(
+				RelativeLayout.LayoutParams.FILL_PARENT, 
+				RelativeLayout.LayoutParams.WRAP_CONTENT);
+
+		WindowManager wm = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
+		Display display = wm.getDefaultDisplay();
+		Point size = new Point();
+		display.getSize(size);
+		adView.setMaxwidth(size.x);
+		int adHeight=56;
+		if(size.x > size.y){
+			adHeight = (int) ((size.x*0.6)/6);
+		}
+		else{
+			adHeight = size.x/6;
+		}
+		adView.setMaxheight(adHeight);
+
+		//		if(ad_view.getBottom() <= 50){
+		//			lay.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+		//		}
+		//		else{
+		//			lay.addRule(RelativeLayout.ALIGN_PARENT_TOP);	
+		//		}
+		lay.addRule(RelativeLayout.ALIGN_PARENT_TOP);	
+
+		rl.addView(adView);
+		ad_view.addView(rl,lay);
+		adView.setAdExpandListener(new AdExpandListener() {
+			@Override
+			public void onExpand() {
+
+			}
+			@Override
+			public void onClose() {
+
+			}
+		});
+
+		adView.setOnAdDownload(new AdViewCore.OnAdDownload() {
+
+			@Override
+			public void begin(AdView sender) {
+				if(isOnline())
+				{
+					Log.d("MRAID", "Beginning ad download");
+					Log.i("MRAID","settings: "+getAdSetting("inline","secret")+" :: "+getAdSetting("inline","zoneid"));
+					((Activity) mContext).runOnUiThread(new Runnable() {
+						public void run() {
+							final ValueAnimator va = ValueAnimator.ofInt((int)ad_view.getHeight(), 0);
+							va.setDuration(50);
+							va.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+								public void onAnimationUpdate(ValueAnimator animation) {
+									Integer value = (Integer) animation.getAnimatedValue();
+									ad_view.getLayoutParams().height = value.intValue();
+									ad_view.requestLayout();
+								}
+
+							});
+
+							Runnable mMyRunnable = new Runnable()
+							{
+								@Override
+								public void run()
+								{
+									va.start();
+								}
+							};
+							Handler myHandler = new Handler();
+							myHandler.postDelayed(mMyRunnable, 5);
+						}
+					});
+				}
+			}
+			@Override
+			public void end(final AdView sender) 
+			{
+				if(isOnline())
+				{
+
+					((Activity) mContext).runOnUiThread(new Runnable() {
+						public void run() {
+							WindowManager wm = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
+							Display display = wm.getDefaultDisplay();
+							Point size = new Point();
+							display.getSize(size);
+							int adHeight=54;//for now.
+
+							if(size.x > size.y){
+								adHeight = (int) ((size.x*0.6)/6);
+							}
+							else{
+								adHeight = size.x/6;
+							}
+
+							Log.e("MRAID","Ad height:"+adHeight);
+							if(ad_view.getLayoutParams().height < 50)
+							{
+								SharedPreferences settings = mContext.getSharedPreferences("ThumbrSettings", Context.MODE_PRIVATE);
+								int finalheight = settings.getInt("inlineAdHeight", adHeight);
+
+								if(finalheight < 50){finalheight = adHeight;}
+								Log.i("MRAID","Final height: "+finalheight);
+								final ValueAnimator va = ValueAnimator.ofInt(0, finalheight);
+								va.setDuration(500);
+								va.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+									public void onAnimationUpdate(ValueAnimator animation) {
+										Integer value = (Integer) animation.getAnimatedValue();
+										ad_view.getLayoutParams().height = value.intValue();
+										ad_view.requestLayout();
+									}
+
+								});
+
+								Runnable mMyRunnable = new Runnable()
+								{
+									@Override
+									public void run()
+									{
+										va.start();
+									}
+								};
+								Handler myHandler = new Handler();
+								myHandler.postDelayed(mMyRunnable, 1000);
+
+							}else{		
+
+								Runnable mMyRunnable = new Runnable()
+								{
+									@Override
+									public void run()
+									{
+										//									RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) ad_view.getLayoutParams();
+										//									params.height = LayoutParams.WRAP_CONTENT;
+										//ad_view.setLayoutParams(params);
+									}
+								};
+								Handler myHandler = new Handler();
+								myHandler.postDelayed(mMyRunnable, 500);							
+
+							}
+						}
+					});
+				}
+			}
+
+			@Override
+			public void error(AdView sender, String error) {
+				Log.e("MRAID", "Error in ad download phase: " + error);
+
+				if(isOnline()){((Activity) mContext).runOnUiThread(new Runnable() {
+					public void run() {
+						ValueAnimator va = ValueAnimator.ofInt((int)ad_view.getHeight(), 0);
+						va.setDuration(100);
+						va.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+							public void onAnimationUpdate(ValueAnimator animation) {
+								Integer value = (Integer) animation.getAnimatedValue();
+								ad_view.getLayoutParams().height = value.intValue();
+								ad_view.requestLayout();
+							}
+						});
+						va.start();
+					}});
+				}
+			}
+
+			@Override
+			public void noad(AdView sender) {
+				Log.d("MRAID", "The ad server responded by telling us no ad is available");
+				if(isOnline())
+				{
+					((Activity) mContext).runOnUiThread(new Runnable() {
+						public void run() {
+							ValueAnimator va = ValueAnimator.ofInt((int)ad_view.getHeight(), 0);
+							va.setDuration(100);
+							va.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+								public void onAnimationUpdate(ValueAnimator animation) {
+									Integer value = (Integer) animation.getAnimatedValue();
+									ad_view.getLayoutParams().height = value.intValue();
+									ad_view.requestLayout();
+								}
+							});
+							va.start();     
+						}});
+				}
+			}
+		});
+
+	}
 }
+

@@ -1,10 +1,13 @@
 package com.gkxim.tqhung.thumbr.dev_demo;
 
+import java.util.Locale;
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
-import android.graphics.Point;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -16,7 +19,9 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
+
 import com.appsflyer.AppsFlyerLib;
 import com.gkxim.android.thumbsdk.FunctionThumbrSDK;
 import com.gkxim.android.thumbsdk.utils.ProfileObject;
@@ -28,8 +33,8 @@ public class ThumbrSDKTest extends Activity implements OnClickListener,OnDismiss
 	 */
 
 	//APP SPECIFIC SETTINGS
-	private String sid = "";
-	private String client_id = "";
+	private String sid = "com.thumbr.skijumping12free";
+	private String client_id = "84758475-476574";
 	private String score_game_id = "";
 
 	//DEFAULT GAME ORIENTATION (USED IN onDismiss() BELOW, TO SWITCH BACK AFTER SDK CLOSE)
@@ -39,7 +44,7 @@ public class ThumbrSDKTest extends Activity implements OnClickListener,OnDismiss
 	//HIDE THE CLOSE BUTTON (ONLY USE IN-SDK PLAY BUTTON)
 	private boolean showButtonClose = true;
 	//THUMBR BUTTON WIDTH/HEIGHT, RELATIVE TO SCREEN WIDTH (MAX. 120PX)
-	private double buttonWidth = 0.25;
+	private double buttonWidth = 0.15;
 
 	/*
 	 * OTHER, MORE GENERIC SETTINGS (LEAVE AS IS)
@@ -50,22 +55,49 @@ public class ThumbrSDKTest extends Activity implements OnClickListener,OnDismiss
 	private String registerUrl = "http://gasp.thumbr.com/auth/authorize?";
 	private String switchUrl = "http://gasp.thumbr.com/auth/authorize?";
 	private String portalUrl = "http://m.thumbr.com?";
+	private String SDKLayout = "thumbr";
+	//AD SERVING SETTINGS
+	private int updateTimeInterval = 15;//number of seconds before Ad refresh
+	private int autocloseInterstitialTime = 600;//number of seconds before interstitial Ad closes
+	private int showCloseButtonTime = 6;//Number of seconds before the Ad close button appears
+	private String tablet_Inline_zoneid = "1356888057";
+	private String tablet_Inline_secret = "20E1A8C6655F7D3E";
+	private String tablet_Overlay_zoneid = "3356907052";
+	private String tablet_Overlay_secret = "ADAA22CB6D2AFDD3";
+	private String tablet_Interstitial_zoneid = "7356917050";
+	private String tablet_Interstitial_secret = "CB45B76FE96C8896";
+	private String phone_Inline_zoneid = "0345893057";
+	private String phone_Inline_secret = "04F006733229C984";
+	private String phone_Overlay_zoneid = "7345907052";
+	private String phone_Overlay_secret = "AEAAA69F395BA8FA";
+	private String phone_Interstitial_zoneid = "9345913059";
+	private String phone_Interstitial_secret = "04B882960D362099";
 
 	///LEAVE THESE VALUES EMPTY, UNLESS YOU KNOW WHAT YOU'RE DOING
-	private String SDKLayout = "thumbr";
 	private String country = "";//eg: DE or NL
 	private String locale = "";//eg: nl_NL or de_DE
 	private String appsFlyerId="";
-	private int requestedOrientation;		
-	/*
-	 * END SETTINGS
-	 */
-
 	FunctionThumbrSDK thumbr;
-	private String layout;
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	protected void onPause() {
+		thumbr.pause();
+		super.onPause();
+	}	
+	@Override
+	protected void onResume(){
+		thumbr.resume();
+		super.onResume();		
+	}
+
+	@SuppressLint("NewApi")
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {	
+
+		Locale l = Locale.getDefault();
+		if(country == ""){country = l.getCountry();}
+		if(locale == ""){locale = l.getLanguage()+"_"+country;}
+
 		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
 		StrictMode.setThreadPolicy(policy);
 
@@ -73,15 +105,42 @@ public class ThumbrSDKTest extends Activity implements OnClickListener,OnDismiss
 		AppsFlyerLib.sendTracking(this,appsFlyerKey);
 		appsFlyerId = AppsFlyerLib.getAppsFlyerUID(this);
 
-		this.getSharedPreferences("ThumbrSettings", MODE_PRIVATE).edit().putString("score_game_id",score_game_id).commit();
-		this.layout="appsilike";
+		SharedPreferences settings = this.getSharedPreferences("ThumbrSettings", Context.MODE_PRIVATE);
+		settings.edit().putString("score_game_id",score_game_id).commit();
+		settings.edit().putInt("updateTimeInterval", updateTimeInterval).commit();
+		settings.edit().putInt("autocloseInterstitialTime", autocloseInterstitialTime).commit();		
+		settings.edit().putInt("showCloseButtonTime", showCloseButtonTime).commit();	
+		settings.edit().putString("tablet_Inline_zoneid", tablet_Inline_zoneid).commit();		
+		settings.edit().putString("tablet_Inline_secret", tablet_Inline_secret).commit();		
+		settings.edit().putString("tablet_Overlay_zoneid", tablet_Overlay_zoneid).commit();		
+		settings.edit().putString("tablet_Overlay_secret", tablet_Overlay_secret).commit();		
+		settings.edit().putString("tablet_Interstitial_zoneid", tablet_Interstitial_zoneid).commit();		
+		settings.edit().putString("tablet_Interstitial_secret", tablet_Interstitial_secret).commit();		
+		settings.edit().putString("phone_Inline_zoneid", phone_Inline_zoneid).commit();		
+		settings.edit().putString("phone_Inline_secret", phone_Inline_secret).commit();		
+		settings.edit().putString("phone_Overlay_zoneid", phone_Overlay_zoneid).commit();		
+		settings.edit().putString("phone_Overlay_secret", phone_Overlay_secret).commit();		
+		settings.edit().putString("phone_Interstitial_zoneid", phone_Interstitial_zoneid).commit();		
+		settings.edit().putString("phone_Interstitial_secret", phone_Interstitial_secret).commit();		
+		settings.edit().putString("sid", sid).commit();
+		settings.edit().putString("client_id", client_id).commit();
+
 		// SET VIEW
 		super.onCreate(savedInstanceState);
 		setContentView(com.gkxim.tqhung.thumbr.demo.R.layout.home);
 
-		//CREATE BUTTON LISTENERS
+		//CREATE THUMBR BUTTON LISTENER
 		ImageButton bt=(ImageButton) findViewById(com.gkxim.tqhung.thumbr.demo.R.id.bt_re);
-		bt.setOnClickListener(this);   
+		bt.setOnClickListener(this);
+
+
+		//CREATE AD BUTTON LISTENERS (FOR DEMO ONLY)
+		Button bt_inline=(Button) findViewById(com.gkxim.tqhung.thumbr.demo.R.id.inline);
+		bt_inline.setOnClickListener(this);
+		Button bt_overlay=(Button) findViewById(com.gkxim.tqhung.thumbr.demo.R.id.overlay);
+		bt_overlay.setOnClickListener(this);
+		Button bt_interstitial=(Button) findViewById(com.gkxim.tqhung.thumbr.demo.R.id.interstitial);
+		bt_interstitial.setOnClickListener(this);		
 
 		//CALL THE THUMBR LIBRARY
 		thumbr=new FunctionThumbrSDK(this, 2);
@@ -91,38 +150,56 @@ public class ThumbrSDKTest extends Activity implements OnClickListener,OnDismiss
 		thumbr.setOrientation(thumbrSDKOrientation);
 		thumbr.setAction(action);
 		thumbr.setLinkRegister(registerUrl+"response_type=token&country="+country+"&locale="+locale+"&sid="+sid+"&client_id="+client_id+"&handset_id="+appsFlyerId);			
+		thumbr.adInit();//initialize Ads if you are showing Thumbr Ads
+
 
 		//DISABLE FOLLOWING LINE NOT TO OPEN THE WINDOW ON APP STARTUP
 		//thumbr.buttonREGISTER();
 	}
 
-
-
-	//LOAD AND ANIMATE THE THUMBR LOGO :: RESIZE IT TO A PERCENTAGE OF THE SCREEN WIDTH
 	@Override
 	public void onWindowFocusChanged(boolean hasFocus) {
+
+		//LOAD AND ANIMATE THE THUMBR LOGO :: RESIZE IT TO A PERCENTAGE OF THE SCREEN WIDTH
 		ImageButton thumbrLogo = (ImageButton) findViewById(com.gkxim.tqhung.thumbr.demo.R.id.bt_re);//CHANGE THIS PATH TO THE THUMBR BUTTON IN YOUR LAYOUT
 
 		Display display = getWindowManager().getDefaultDisplay();
-		Point size = new Point();
-		display.getSize(size);
-		int width = (int) (size.x * buttonWidth);
-		//if(width > 120){width = 120;}
+
+		int width = (int) (display.getWidth() * buttonWidth);
+		if(width > 150){width = 150;}//optional
+
 		LayoutParams params =new LinearLayout.LayoutParams(width,width);        
 		thumbrLogo.setLayoutParams(params);
 
 		thumbrLogo.setBackgroundResource(com.gkxim.tqhung.thumbr.demo.R.drawable.anim_thumbr_logo);
 		AnimationDrawable thumbrLogoAnimation = (AnimationDrawable) thumbrLogo.getBackground();
-		thumbrLogoAnimation.start();    
+		thumbrLogoAnimation.start();   
+
 	}
 
 	//CATCH BUTTON CLICKS
 	@Override
 	public void onClick(View v) {   
+		//OPEN THUMBR SDK
 		if(v.getId()==com.gkxim.tqhung.thumbr.demo.R.id.bt_re){//CHANGE THIS PATH TO THE THUMBR BUTTON IN YOUR LAYOUT!!
-			thumbr.setLinkRegister(registerUrl+"response_type=token&country="+country+"&locale="+locale+"&sid="+sid+"&client_id="+client_id+"&handset_id="+appsFlyerId);            
 			thumbr.buttonREGISTER();
-		}             
+		}
+
+		//START ADVERTISEMENT ACTIONS
+		if(v.getId()==com.gkxim.tqhung.thumbr.demo.R.id.inline){
+			final RelativeLayout ad_view = (RelativeLayout) findViewById(com.gkxim.tqhung.thumbr.demo.R.id.ad_view);
+			thumbr.adInline(ad_view);	
+		}
+		if(v.getId()==com.gkxim.tqhung.thumbr.demo.R.id.overlay){
+			final RelativeLayout ad_view = (RelativeLayout) findViewById(com.gkxim.tqhung.thumbr.demo.R.id.ad_view);	
+			thumbr.adOverlay(ad_view);
+		}
+		if(v.getId()==com.gkxim.tqhung.thumbr.demo.R.id.interstitial){
+			final RelativeLayout ad_view = (RelativeLayout) findViewById(com.gkxim.tqhung.thumbr.demo.R.id.ad_view_interstitial);
+			thumbr.adInterstitial(ad_view);
+		}
+		//END ADVERTISEMENT ACTIONS
+
 	} 
 
 	/*
@@ -144,12 +221,6 @@ public class ThumbrSDKTest extends Activity implements OnClickListener,OnDismiss
 	public void getUserData(){
 		ProfileObject ojb=thumbr.didLoginUser();            
 		if(ojb!=null){
-
-			if(ojb.getmEmail() != "null"){
-				//OPTIONALLY CHANGE THE THUMBR SDK ORIENTATION AFTER USER HAS SUBSCRIBED (WAR2GLORY NEEDS THIS SETTING!!!)
-				thumbr.setOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-			}
-
 			//DO SOMETHING WITH THE USER OBJECT
 			if(debug == true){Toast.makeText(this,"User ID: "+ojb.getmID(), 4000).show();}
 			Log.i("ID",ojb.getmID());

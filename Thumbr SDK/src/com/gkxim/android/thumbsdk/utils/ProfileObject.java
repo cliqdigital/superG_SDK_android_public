@@ -14,9 +14,12 @@ public class ProfileObject {
 	private String mEmail="";
 	private String mSurname="";
 	private String mGender="";
+	private String mAge="";	
 	private String mDOB="";
 	private String mLocale="";
 	private String mCity="";
+	private String mIncome="";	
+	private String mCountry="";	
 	private String mAddress="";
 	private String mZipCode="";
 	private String mNewsLetter="";
@@ -35,6 +38,12 @@ public class ProfileObject {
 	public String getmCity() {
 		return mCity;
 	}
+	public String getmIncome() {
+		return mIncome;
+	}	
+	public String getmCountry() {
+		return mCountry;
+	}	
 	public String getmDOB() {
 		return mDOB;
 	}
@@ -47,6 +56,9 @@ public class ProfileObject {
 	public String getmGender() {
 		return mGender;
 	}
+	public String getmAge() {
+		return mAge;
+	}	
 	public String getmHousenr() {
 		return mHousenr;
 	}
@@ -82,6 +94,12 @@ public class ProfileObject {
 	public void setmCity(String mCity) {
 		this.mCity = mCity;
 	}
+	public void setmIncome(String mIncome) {
+		this.mIncome = mIncome;
+	}	
+	public void setmCountry(String mCountry) {
+		this.mCity = mCountry;
+	}	
 	public void setmDOB(String mDOB) {
 		this.mDOB = mDOB;
 	}
@@ -94,6 +112,9 @@ public class ProfileObject {
 	public void setmGender(String mGender) {
 		this.mGender = mGender;
 	}
+	public void setmAge(String mAge) {
+		this.mAge = mAge;
+	}	
 	public void setmHousenr(String mHousenr) {
 		this.mHousenr = mHousenr;
 	}

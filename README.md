@@ -15,9 +15,18 @@ Revision history
 ----------------
 <table>
 	<tr>
+		<td>2.0.3</td>
+		<td>
+			-Added ad serving<br />
+			-Added SSL support<br />
+			-Some small bug fixes
+			
+		</td>
+	</tr>
+	<tr>
 		<td>2.0.22</td>
 		<td>
-		-Added support for alternative layout
+		-Added support for alternative layout<br />
 		-Catch url's that contain 'openinbrowser' and open them in browser<br />
 		-Send along SDK version number to Thumbr server<br />
 		-Improved orientation behavior<br />
@@ -95,13 +104,22 @@ Update your AndroidManifest.xml with at least the settings below:
 	    package="com.yourcompany.yourgame"
 	    android:versionCode="1"
 	    android:versionName="1.0" >
-	    <uses-sdk android:targetSdkVersion="16" android:minSdkVersion="9" />
-	
-	    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-	    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-	    <uses-permission android:name="android.permission.INTERNET" />
-	    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-	
+	        <uses-sdk android:targetSdkVersion="16" android:minSdkVersion="10" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
+    <uses-permission android:name="android.permission.WRITE_CALENDAR" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    	
 	    <application
 	        android:icon="@drawable/ic_launcher"
 	        android:debuggable="true"        
@@ -130,7 +148,7 @@ Update your AndroidManifest.xml with at least the settings below:
 
 
 ### Step 5:
-Create the buttons in your layout (eg. the main screen)
+Create the Thumbr button in your layout (eg. the main screen)
 
 Register button (bt_re) (within linear layout)
 
@@ -153,6 +171,27 @@ Switch User button (bt_switch) :: OPTIONAL :: THIS BUTTON IS USED TO LET THE USE
 
 	<Button android:id="@+id/bt_switch" style="?android:attr/buttonStyleSmall" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="bottom|left" android:text="Switch User" />
 	
+If you are using Advertisements add these ad_views to your layout (s)
+
+	<RelativeLayout
+        android:id="@+id/ad_view"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_alignParentBottom="false"
+        android:layout_alignParentTop="true"
+        android:layout_centerInParent="true"
+        android:layout_gravity="bottom"
+        android:background="@color/transparent" >
+    </RelativeLayout>	
+	
+	<RelativeLayout
+        android:id="@+id/ad_view_interstitial"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@color/transparent" >
+    </RelativeLayout>	
+	
 ### Step 6 ACTIVITY FILE:
 Update the *activity file*, where Thumbr will be called (usually your main activity)
 Look at the demo application to see a [complete implementation](https://github.com/cliqdigital/thumbr_SDK_android_public/blob/master/Demo%20App/src/com/gkxim/tqhung/thumbr/dev_demo/ThumbrSDKTest.java) 
@@ -162,26 +201,31 @@ Look at the demo application to see a [complete implementation](https://github.c
 
 **Import at least these libraries**
 
-		import android.app.Activity;
-		import android.content.DialogInterface;
-		import android.content.DialogInterface.OnDismissListener;
-		import android.content.pm.ActivityInfo;
-		import android.graphics.Point;
-		import android.graphics.drawable.AnimationDrawable;
-		import android.os.Bundle;
-		import android.os.StrictMode;
-		import android.util.Log;
-		import android.view.Display;
-		import android.view.View;
-		import android.view.View.OnClickListener;
-		import android.view.ViewGroup.LayoutParams;
-		import android.widget.Button;
-		import android.widget.ImageButton;
-		import android.widget.LinearLayout;
-		import android.widget.Toast;
-		import com.appsflyer.AppsFlyerLib;
-		import com.gkxim.android.thumbsdk.FunctionThumbrSDK;
-		import com.gkxim.android.thumbsdk.utils.ProfileObject;
+	import java.util.Locale;
+	import android.annotation.SuppressLint;
+	import android.app.Activity;
+	import android.content.Context;
+	import android.content.DialogInterface;
+	import android.content.DialogInterface.OnDismissListener;
+	import android.content.SharedPreferences;
+	import android.content.pm.ActivityInfo;
+	import android.graphics.drawable.AnimationDrawable;
+	import android.os.Bundle;
+	import android.os.StrictMode;
+	import android.util.Log;
+	import android.view.Display;
+	import android.view.View;
+	import android.view.View.OnClickListener;
+	import android.view.ViewGroup.LayoutParams;
+	import android.widget.Button;
+	import android.widget.ImageButton;
+	import android.widget.LinearLayout;
+	import android.widget.RelativeLayout;
+	import android.widget.Toast;	
+	import com.appsflyer.AppsFlyerLib;
+	import com.gkxim.android.thumbsdk.FunctionThumbrSDK;
+	import com.gkxim.android.thumbsdk.utils.ProfileObject;
+
 		
 **Open your class and make sure to implement OnClickListener, OndismissListener**
 
@@ -206,35 +250,69 @@ Look at the demo application to see a [complete implementation](https://github.c
 		//THUMBR BUTTON WIDTH/HEIGHT, RELATIVE TO SCREEN WIDTH (MAX. 120PX)
 		private double buttonWidth = 0.2;
 
-**Add more generic settings. Normally you don't have to change these**
+**Add more generic settings. <br />
+THE AD SERVING SETTINGS NEED TO BE REPLACED. THE SETTINGS BELOW ARE DEMO SETTINGS ONLY**
 		
-			/*
-			 * OTHER, MORE GENERIC SETTINGS (LEAVE AS IS)
-			 */
-			private String action = "registration";
-			private String appsFlyerKey = "9ngR4oQcH5qz7qxcFb7ftd";	
-			private Boolean debug = false; //OPTIONALLY SWITCH TO 'true' DURING IMPLEMENTATION		
-			private String registerUrl = "http://gasp.thumbr.com/auth/authorize?";
-			private String switchUrl = "http://gasp.thumbr.com/auth/authorize?";
-			private String portalUrl = "http://m.thumbr.com?";
-			
-			///LEAVE THESE VALUES EMPTY, UNLESS YOU KNOW WHAT YOU'RE DOING 
-			private String country = "";//eg: DE or NL
-			private String locale = "";//eg: nl_NL or de_DE
-			private String appsFlyerId="";
-			private int requestedOrientation;		
+	/*
+	 * OTHER, MORE GENERIC SETTINGS
+	 */
+	private String action = "registration";
+	private String appsFlyerKey = "9ngR4oQcH5qz7qxcFb7ftd";	
+	private Boolean debug = false; //OPTIONALLY SWITCH TO 'true' DURING IMPLEMENTATION		
+	private String registerUrl = "http://gasp.thumbr.com/auth/authorize?";
+	private String switchUrl = "http://gasp.thumbr.com/auth/authorize?";
+	private String portalUrl = "http://m.thumbr.com?";
+	private String SDKLayout = "thumbr";
+	
+	//AD SERVING SETTINGS
+	private int updateTimeInterval = 15;//number of seconds before Ad refresh
+	private int autocloseInterstitialTime = 600;//number of seconds before interstitial Ad closes
+	private int showCloseButtonTime = 6;//Number of seconds before the Ad close button appears
+	private String tablet_Inline_zoneid = "1356888057";
+	private String tablet_Inline_secret = "20E1A8C6655F7D3E";
+	private String tablet_Overlay_zoneid = "3356907052";
+	private String tablet_Overlay_secret = "ADAA22CB6D2AFDD3";
+	private String tablet_Interstitial_zoneid = "7356917050";
+	private String tablet_Interstitial_secret = "CB45B76FE96C8896";
+	private String phone_Inline_zoneid = "0345893057";
+	private String phone_Inline_secret = "04F006733229C984";
+	private String phone_Overlay_zoneid = "7345907052";
+	private String phone_Overlay_secret = "AEAAA69F395BA8FA";
+	private String phone_Interstitial_zoneid = "9345913059";
+	private String phone_Interstitial_secret = "04B882960D362099";
+	
+	///LEAVE THESE VALUES EMPTY, UNLESS YOU KNOW WHAT YOU'RE DOING
+	private String country = "";//eg: DE or NL
+	private String locale = "";//eg: nl_NL or de_DE
+	private String appsFlyerId="";	
 		/*
 		 * END SETTINGS
 		 */
 
-**Define the 'thumbr' object**
+**Define the 'thumbr' object and add / edit onPause and onResume functions**
 
 		FunctionThumbrSDK thumbr;
 
+	@Override
+	protected void onPause() {
+		thumbr.pause();
+	super.onPause();
+	}	
+	@Override
+	protected void onResume(){
+		thumbr.resume();
+		super.onResume();		
+	}
+	
 **Modify your onCreate function**
 
 		@Override
 		protected void onCreate(Bundle savedInstanceState) {
+		
+		Locale l = Locale.getDefault();
+		if(country == ""){country = l.getCountry();}
+		if(locale == ""){locale = l.getLanguage()+"_"+country;}
+				
 			//Override strict mode
 			StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
 			StrictMode.setThreadPolicy(policy);
@@ -242,6 +320,27 @@ Look at the demo application to see a [complete implementation](https://github.c
 			//IMPORT APPSFLYER
 			AppsFlyerLib.sendTracking(this,appsFlyerKey);
 			appsFlyerId = AppsFlyerLib.getAppsFlyerUID(this);
+	
+		//SET AD SERVER SETTINGS
+		SharedPreferences settings = this.getSharedPreferences("ThumbrSettings", Context.MODE_PRIVATE);
+		settings.edit().putString("score_game_id",score_game_id).commit();
+		settings.edit().putInt("updateTimeInterval", updateTimeInterval).commit();
+		settings.edit().putInt("autocloseInterstitialTime", autocloseInterstitialTime).commit();
+		settings.edit().putInt("showCloseButtonTime", showCloseButtonTime).commit();
+		settings.edit().putString("tablet_Inline_zoneid", tablet_Inline_zoneid).commit();
+		settings.edit().putString("tablet_Inline_secret", tablet_Inline_secret).commit();
+		settings.edit().putString("tablet_Overlay_zoneid", tablet_Overlay_zoneid).commit();
+		settings.edit().putString("tablet_Overlay_secret", tablet_Overlay_secret).commit();
+		settings.edit().putString("tablet_Interstitial_zoneid", tablet_Interstitial_zoneid).commit();
+		settings.edit().putString("tablet_Interstitial_secret", tablet_Interstitial_secret).commit();
+		settings.edit().putString("phone_Inline_zoneid", phone_Inline_zoneid).commit();
+		settings.edit().putString("phone_Inline_secret", phone_Inline_secret).commit();
+		settings.edit().putString("phone_Overlay_zoneid", phone_Overlay_zoneid).commit();
+		settings.edit().putString("phone_Overlay_secret", phone_Overlay_secret).commit();
+		settings.edit().putString("phone_Interstitial_zoneid", phone_Interstitial_zoneid).commit();
+		settings.edit().putString("phone_Interstitial_secret", phone_Interstitial_secret).commit();
+		settings.edit().putString("sid", sid).commit();
+		settings.edit().putString("client_id", client_id).commit();			
 			
 			// SET VIEW FOR YOUR APPLICATION
 			super.onCreate(savedInstanceState);
@@ -253,12 +352,14 @@ Look at the demo application to see a [complete implementation](https://github.c
 			Button bt_switch=(Button) findViewById(com.yourcompany.yourapp.R.id.bt_switch);
 			bt_switch.setOnClickListener(this);		
 			
-			//CALL THE THUMBR LIBRARY
+			//CALL THE THUMBR LIBRARY AND REGISTER SETTINGS
 			thumbr=new FunctionThumbrSDK(this, 2);
 			thumbr.setEnableButtonClose(showButtonClose);
 			thumbr.setToastDebug(debug);
 			thumbr.setOrientation(thumbrSDKOrientation);
-
+			thumbr.setLayout(SDKLayout);
+			thumbr.setAction(action);
+		
 		    /*
 		     AT ANY POINT IN THE GAME, YOU CAN CHANGE THE ACTION BEHIND THE THUMBR BUTTON
 		     ALL POSSIBLE VALUES:
@@ -272,7 +373,11 @@ Look at the demo application to see a [complete implementation](https://github.c
 			
 			//(OPTIONAL) AUTOMATICALLY START THE THUMBR SDK WHEN OPENING THE APPLICATION. ONLY THE FIRST TIME, IN THIS EXAMPLE
 			if(thumbr.getCount() < 2){
-				thumbr.setLinkRegister(registerUrl+"response_type=token&country="+country+"&locale="+locale+"&sid="+sid+"&client_id="+client_id+"&handset_id="+appsFlyerId);			
+				thumbr.setLinkRegister(registerUrl+"response_type=token&country="+country+"&locale="+locale+"&sid="+sid+"&client_id="+client_id+"&handset_id="+appsFlyerId);
+				
+			thumbr.adInit();//initialize Ads if you are showing Thumbr Ads
+
+		//DISABLE FOLLOWING LINE NOT TO OPEN THE WINDOW ON APP STARTUP
 				thumbr.buttonREGISTER();
 			}
 
@@ -368,7 +473,21 @@ Look at the demo application to see a [complete implementation](https://github.c
 				if(debug == true){Toast.makeText(this,"Not logged in yet...", 4000).show();}				
 			}
 		}	
-		
+
+**To show Advertisements use these functions at appropirate points in your application**
+
+	//INLINE ADVERTISEMENT:
+		final RelativeLayout ad_view = (RelativeLayout) findViewById(com.gkxim.tqhung.thumbr.demo.R.id.ad_view);
+		thumbr.adInline(ad_view);
+
+	//OVERLAY ADVERTISEMENT:	
+		final RelativeLayout ad_view = (RelativeLayout) findViewById(com.gkxim.tqhung.thumbr.demo.R.id.ad_view);
+		thumbr.adOverlay(ad_view);
+
+	//INTERSTITIAL ADVERTISEMENT:
+		final RelativeLayout ad_view = (RelativeLayout) findViewById(com.gkxim.tqhung.thumbr.demo.R.id.ad_view_interstitial);
+		thumbr.adInterstitial(ad_view);
+					
 **Closing the class**	
 		
 	}
