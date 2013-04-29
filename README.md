@@ -477,15 +477,15 @@ THE AD SERVING SETTINGS NEED TO BE REPLACED. THE SETTINGS BELOW ARE DEMO SETTING
 **To show Advertisements use these functions at appropirate points in your application**
 
 	//INLINE ADVERTISEMENT:
-		final RelativeLayout ad_view = (RelativeLayout) findViewById(com.gkxim.tqhung.thumbr.demo.R.id.ad_view);
+		final RelativeLayout ad_view = (RelativeLayout) findViewById(com.yourcompany.yourapp.R.id.ad_view);
 		thumbr.adInline(ad_view);
 
 	//OVERLAY ADVERTISEMENT:	
-		final RelativeLayout ad_view = (RelativeLayout) findViewById(com.gkxim.tqhung.thumbr.demo.R.id.ad_view);
+		final RelativeLayout ad_view = (RelativeLayout) findViewById(com.yourcompany.yourapp.R.id.ad_view);
 		thumbr.adOverlay(ad_view);
 
 	//INTERSTITIAL ADVERTISEMENT:
-		final RelativeLayout ad_view = (RelativeLayout) findViewById(com.gkxim.tqhung.thumbr.demo.R.id.ad_view_interstitial);
+		final RelativeLayout ad_view = (RelativeLayout) findViewById(com.yourcompany.yourapp.R.id.ad_view_interstitial);
 		thumbr.adInterstitial(ad_view);
 					
 **Closing the class**	
