@@ -98,7 +98,7 @@ public class ProfileObject {
 		this.mIncome = mIncome;
 	}	
 	public void setmCountry(String mCountry) {
-		this.mCity = mCountry;
+		this.mCountry = mCountry;
 	}	
 	public void setmDOB(String mDOB) {
 		this.mDOB = mDOB;

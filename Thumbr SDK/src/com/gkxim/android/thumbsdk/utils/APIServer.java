@@ -28,7 +28,7 @@ public class APIServer {
 	public static String sID = "playnow-test";
 	public static String step_SwitchAccount = "switchaccount";
 	public static String respone = "token";
-	public static String LinkPortal = "http://mobile.thumbr.com/start/?access_token=";
+	public static String LinkPortal = "https://mobile.thumbr.com/start/?access_token=";
 	public static String profileURL = "https://gasp.thumbr.com/api/v1/profile?access_token=";
 	public static Context mContext;
 
@@ -44,6 +44,7 @@ public class APIServer {
 			ProfileObject prof = new ProfileObject();
 			String url = profileURL + accToken;
 			JSONHelper parser = new JSONHelper();
+			
 			JSONObject jo = parser.getJSONObject(url);
 			
 			if (jo != null) {

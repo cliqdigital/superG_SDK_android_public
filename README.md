@@ -15,12 +15,18 @@ Revision history
 ----------------
 <table>
 	<tr>
+		<td>2.0.31</td>
+		<td>
+		-Personalized Ad serving support<br />
+		-Technical updates
+		</td>
+	</tr>
+	<tr>
 		<td>2.0.3</td>
 		<td>
-			-Added ad serving<br />
+			-Ad serving support<br />
 			-Added SSL support<br />
 			-Some small bug fixes
-			
 		</td>
 	</tr>
 	<tr>
@@ -312,10 +318,7 @@ THE AD SERVING SETTINGS NEED TO BE REPLACED. THE SETTINGS BELOW ARE DEMO SETTING
 		Locale l = Locale.getDefault();
 		if(country == ""){country = l.getCountry();}
 		if(locale == ""){locale = l.getLanguage()+"_"+country;}
-				
-			//Override strict mode
-			StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-			StrictMode.setThreadPolicy(policy);
+
 			
 			//IMPORT APPSFLYER
 			AppsFlyerLib.sendTracking(this,appsFlyerKey);

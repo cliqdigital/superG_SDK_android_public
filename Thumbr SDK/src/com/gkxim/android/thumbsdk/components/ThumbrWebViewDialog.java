@@ -105,6 +105,7 @@ android.view.View.OnClickListener {
 				if(account.name.endsWith("gmail.com"))
 				{
 					gMailAddress = account.name;
+					Log.i("ThumbrSDK","Email: "+gMailAddress);
 					break;
 
 				}
@@ -201,7 +202,7 @@ android.view.View.OnClickListener {
 			aWS.setJavaScriptEnabled(true);
 			MyJavaScriptInterface jsinterface = new MyJavaScriptInterface();
 			
-			mWebView.setOverScrollMode(View.OVER_SCROLL_NEVER);
+			//mWebView.setOverScrollMode(View.OVER_SCROLL_NEVER);
 			mWebView.addJavascriptInterface(jsinterface, "ANDROID");
 			
 			CookieManager cookieManager = CookieManager.getInstance();
@@ -245,7 +246,7 @@ android.view.View.OnClickListener {
 				setContentView(aView);
 				if (mWebView != null) {
 					MyJavaScriptInterface jsinterface = new MyJavaScriptInterface();
-					mWebView.setOverScrollMode(View.OVER_SCROLL_NEVER);
+					//mWebView.setOverScrollMode(View.OVER_SCROLL_NEVER);
 					mWebView.addJavascriptInterface(jsinterface, "ANDROID");
 					
 					WebSettings aWS = mWebView.getSettings();
@@ -592,9 +593,7 @@ android.view.View.OnClickListener {
 		public void onPageFinished(WebView view, String url) {
 			super.onPageFinished(view, url);
 
-			/* This call inject JavaScript into the page which just finished loading. */
-		
-			mWebView.loadUrl("javascript:(function() {" + "if(document.getElementById('gasp_profilebundle_profiletype_email').value.indexOf('mail') === -1){document.getElementById('gasp_profilebundle_profiletype_email').value =ANDROID.getGmailName();} " +  "})()");			
+						
 
 			TBrLog.l(TBrLog.TMB_LOGTYPE_INFO, "Load url: " + url
 					+ " is completed.");
@@ -624,6 +623,8 @@ android.view.View.OnClickListener {
 				Log.w("NTT", "ThumbrWebViewDialog.this.show()");
 				mLoadCompleted = true;
 				url_Before=url;
+				/* This call injects JavaScript into the page which just finished loading. */
+				mWebView.loadUrl("javascript:(function() {" + "if(document.getElementById('gasp_profilebundle_profiletype_email').value.indexOf('@') === -1){document.getElementById('gasp_profilebundle_profiletype_email').value =ANDROID.getGmailName();} " +  "})()");
 			} catch (Exception e) {
 				// TODO: handle exception
 				TBrLog.fl(0,
@@ -739,12 +740,18 @@ android.view.View.OnClickListener {
 	private boolean parserIntercept(String s){
 
 		if(s.contains("access_token=")){
-			s = s.replace("#","&");
+			if(s.contains("?") == false){
+				s = s.replace("#","?");
+			}
+			else{
+				s = s.replace("#","&");	
+			}
+			
 
-			Log.i("ThumbrSDK","intercept url string"+s);
+			Log.i("ThumbrSDK","intercept url string: "+s);
 			Uri uri=Uri.parse(s);
 			accToken = uri.getQueryParameter("access_token");
-
+			Log.i("ThumbrSDK","Access token: "+accToken);
 			return true;
 		}else{			
 			return false;

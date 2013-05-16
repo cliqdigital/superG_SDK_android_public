@@ -10,7 +10,6 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.util.Log;
 import android.view.Display;
 import android.view.View;
@@ -21,7 +20,6 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
-
 import com.appsflyer.AppsFlyerLib;
 import com.gkxim.android.thumbsdk.FunctionThumbrSDK;
 import com.gkxim.android.thumbsdk.utils.ProfileObject;
@@ -57,8 +55,8 @@ public class ThumbrSDKTest extends Activity implements OnClickListener,OnDismiss
 	private String portalUrl = "http://m.thumbr.com?";
 	private String SDKLayout = "thumbr";
 	//AD SERVING SETTINGS
-	private int updateTimeInterval = 15;//number of seconds before Ad refresh
-	private int autocloseInterstitialTime = 600;//number of seconds before interstitial Ad closes
+	private int updateTimeInterval = 0;//number of seconds before Ad refresh
+	
 	private int showCloseButtonTime = 6;//Number of seconds before the Ad close button appears
 	private String tablet_Inline_zoneid = "1356888057";
 	private String tablet_Inline_secret = "20E1A8C6655F7D3E";
@@ -66,12 +64,12 @@ public class ThumbrSDKTest extends Activity implements OnClickListener,OnDismiss
 	private String tablet_Overlay_secret = "ADAA22CB6D2AFDD3";
 	private String tablet_Interstitial_zoneid = "7356917050";
 	private String tablet_Interstitial_secret = "CB45B76FE96C8896";
-	private String phone_Inline_zoneid = "0345893057";
-	private String phone_Inline_secret = "04F006733229C984";
-	private String phone_Overlay_zoneid = "7345907052";
-	private String phone_Overlay_secret = "AEAAA69F395BA8FA";
-	private String phone_Interstitial_zoneid = "9345913059";
-	private String phone_Interstitial_secret = "04B882960D362099";
+	private String phone_Inline_zoneid = "6382999052";
+	private String phone_Inline_secret = "D3BEE91338ECEBC4";
+	private String phone_Overlay_zoneid = "8383057050";
+	private String phone_Overlay_secret = "A2E465BF955D25A5";
+	private String phone_Interstitial_zoneid = "0383016058";
+	private String phone_Interstitial_secret = "978CF95935DBE01E";
 
 	///LEAVE THESE VALUES EMPTY, UNLESS YOU KNOW WHAT YOU'RE DOING
 	private String country = "";//eg: DE or NL
@@ -98,17 +96,13 @@ public class ThumbrSDKTest extends Activity implements OnClickListener,OnDismiss
 		if(country == ""){country = l.getCountry();}
 		if(locale == ""){locale = l.getLanguage()+"_"+country;}
 
-		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-		StrictMode.setThreadPolicy(policy);
-
 		//IMPORT APPSFLYER
 		AppsFlyerLib.sendTracking(this,appsFlyerKey);
 		appsFlyerId = AppsFlyerLib.getAppsFlyerUID(this);
 
 		SharedPreferences settings = this.getSharedPreferences("ThumbrSettings", Context.MODE_PRIVATE);
 		settings.edit().putString("score_game_id",score_game_id).commit();
-		settings.edit().putInt("updateTimeInterval", updateTimeInterval).commit();
-		settings.edit().putInt("autocloseInterstitialTime", autocloseInterstitialTime).commit();		
+		settings.edit().putInt("updateTimeInterval", updateTimeInterval).commit();		
 		settings.edit().putInt("showCloseButtonTime", showCloseButtonTime).commit();	
 		settings.edit().putString("tablet_Inline_zoneid", tablet_Inline_zoneid).commit();		
 		settings.edit().putString("tablet_Inline_secret", tablet_Inline_secret).commit();		
@@ -214,7 +208,7 @@ public class ThumbrSDKTest extends Activity implements OnClickListener,OnDismiss
 		getUserData();
 
 		//AFTER FIRST OPEN, LET THE SDK KNOW REGISTRATION IS OPTIONAL FROM NOW ON. REGISTRATION FLOW WILL STILL BE SHOWN EVERY #N TIMES (#N = DETERMINED SERVER SIDE)
-		thumbr.setAction("optional_registration");
+		//thumbr.setAction("optional_registration");
 	} 
 
 	//EXAMPLE FUNCTION OF RETURN VALUES
@@ -232,6 +226,7 @@ public class ThumbrSDKTest extends Activity implements OnClickListener,OnDismiss
 			Log.i("DOB",ojb.getmDOB());
 			Log.i("Locale",ojb.getmLocale());
 			Log.i("City",ojb.getmCity());
+			Log.i("Country",ojb.getmCountry());			
 			Log.i("Address",ojb.getmAddress());
 			Log.i("ZipCode",ojb.getmZipCode());
 			Log.i("NewsLetter",ojb.getmNewsLetter());

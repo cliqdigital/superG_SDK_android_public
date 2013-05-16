@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
+import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -35,6 +36,8 @@ import org.json.JSONObject;
 import org.xmlpull.v1.XmlPullParser;
 
 import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -49,6 +52,7 @@ import android.graphics.Color;
 import android.graphics.Point;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Handler;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -61,6 +65,7 @@ import com.MadsAdView.MadsAdView;
 import com.adgoji.mraid.adview.AdExpandListener;
 import com.adgoji.mraid.adview.AdView;
 import com.adgoji.mraid.adview.AdViewCore;
+import com.appsflyer.AppsFlyerLib;
 import com.gkxim.android.thumbsdk.components.ThumbrWebViewDialog;
 import com.gkxim.android.thumbsdk.utils.APIServer;
 import com.gkxim.android.thumbsdk.utils.ProfileObject;
@@ -69,9 +74,13 @@ import com.gkxim.android.thumbsdk.utils.WSLoginListener;
 import com.gkxim.android.thumbsdk.utils.WSRegisterListener;
 import com.gkxim.android.thumbsdk.utils.WSStateCode;
 import com.gkxim.android.thumbsdk.utils.WSSwitchListener;
+import com.nineoldandroids.animation.*;
+import com.nineoldandroids.util.*;
+import com.nineoldandroids.view.*;
+import com.nineoldandroids.view.animation.*;
 
-
-
+@TargetApi(Build.VERSION_CODES.BASE)
+@SuppressLint("NewApi")
 public class FunctionThumbrSDK {
 
 	private static Context mContext;
@@ -92,14 +101,15 @@ public class FunctionThumbrSDK {
 	private String mThumbrId, mGameId;
 	private boolean isShowbutonClose = true;
 	private boolean isConfigchange_orientation = false;
-
+	
 	public static final int MY_ORIENTATION = 0x0080;
 	private static final int MODE_WORLD_READABLE = 1;
 
 	private String linkRegister = "";
 	private String linkSwitch = "";
 	private String linkPortal = "";
-
+	private String theKey = "49b26e3ac8701cf4c5840587d1d5e6eba01ab329b9179f6aef925f362a98065f";
+	
 	private OnScoreSavedListener onScoreSavedListener;
 	private String SDKLayout;
 	protected MadsAdView adView;
@@ -404,9 +414,8 @@ public class FunctionThumbrSDK {
 		TelephonyManager manager = (TelephonyManager)mContext.getSystemService(Context.TELEPHONY_SERVICE);
 		WindowManager wm = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
 		Display display = wm.getDefaultDisplay();
-		Point size = new Point();
-		display.getSize(size);		
-		if (manager.getPhoneType() == TelephonyManager.PHONE_TYPE_NONE && size.x >= 728 ) {
+
+		if (manager.getPhoneType() == TelephonyManager.PHONE_TYPE_NONE && display.getWidth() >= 728 ) {
 			// Yes, this is a tablet!
 			//	Log.i("MRAID","I'm a tablet, I'm a tablet!!");
 			return true;
@@ -463,6 +472,26 @@ public class FunctionThumbrSDK {
 				mContext.getSharedPreferences(FunctionThumbrSDK.LOGINED,Context.MODE_PRIVATE).edit().putBoolean(LOGINED, true).commit();
 				mContext.getSharedPreferences("ThumbrSettings",Context.MODE_PRIVATE).edit().putString("ID", obj.getmID().toString()).commit();
 				mContext.getSharedPreferences("ThumbrSettings",Context.MODE_PRIVATE).edit().putString("Username",obj.getmUserName() ).commit();
+
+				mContext.getSharedPreferences("ThumbrSettings",Context.MODE_PRIVATE).edit().putString("handset_id",AppsFlyerLib.getAppsFlyerUID(mContext).toString() ).commit();
+				mContext.getSharedPreferences("ThumbrSettings",Context.MODE_PRIVATE).edit().putString("thumbr_id",obj.getmID() ).commit();				
+				mContext.getSharedPreferences("ThumbrSettings",Context.MODE_PRIVATE).edit().putString("address",obj.getmAddress() ).commit();				
+				mContext.getSharedPreferences("ThumbrSettings",Context.MODE_PRIVATE).edit().putString("city",obj.getmCity() ).commit();				
+				mContext.getSharedPreferences("ThumbrSettings",Context.MODE_PRIVATE).edit().putString("country",obj.getmCountry() ).commit();				
+				mContext.getSharedPreferences("ThumbrSettings",Context.MODE_PRIVATE).edit().putString("email",obj.getmEmail() ).commit();				
+				mContext.getSharedPreferences("ThumbrSettings",Context.MODE_PRIVATE).edit().putString("firstname",obj.getmFirstName() ).commit();				
+				mContext.getSharedPreferences("ThumbrSettings",Context.MODE_PRIVATE).edit().putString("locale",obj.getmLocale() ).commit();				
+				mContext.getSharedPreferences("ThumbrSettings",Context.MODE_PRIVATE).edit().putString("msisdn",obj.getmSisdn() ).commit();				
+				mContext.getSharedPreferences("ThumbrSettings",Context.MODE_PRIVATE).edit().putString("newsletter",obj.getmNewsLetter() ).commit();				
+				mContext.getSharedPreferences("ThumbrSettings",Context.MODE_PRIVATE).edit().putString("status",obj.getmStatus() ).commit();				
+				mContext.getSharedPreferences("ThumbrSettings",Context.MODE_PRIVATE).edit().putString("surname",obj.getmSurname() ).commit();				
+				mContext.getSharedPreferences("ThumbrSettings",Context.MODE_PRIVATE).edit().putString("username",obj.getmUserName() ).commit();				
+				mContext.getSharedPreferences("ThumbrSettings",Context.MODE_PRIVATE).edit().putString("zipcode",obj.getmZipCode() ).commit();				
+				mContext.getSharedPreferences("ThumbrSettings",Context.MODE_PRIVATE).edit().putString("gender",obj.getmGender() ).commit();				
+				mContext.getSharedPreferences("ThumbrSettings",Context.MODE_PRIVATE).edit().putString("age",obj.getmAge() ).commit();
+				mContext.getSharedPreferences("ThumbrSettings",Context.MODE_PRIVATE).edit().putString("date_of_birth",obj.getmDOB() ).commit();
+				mContext.getSharedPreferences("ThumbrSettings",Context.MODE_PRIVATE).edit().putString("housenr",obj.getmHousenr() ).commit();
+				mContext.getSharedPreferences("ThumbrSettings",Context.MODE_PRIVATE).edit().putString("token",getAccessToken() ).commit();				
 			}else{
 				mContext.getSharedPreferences(FunctionThumbrSDK.LOGINED,Context.MODE_PRIVATE).edit().putBoolean(LOGINED, false).commit();
 			}
@@ -472,12 +501,12 @@ public class FunctionThumbrSDK {
 
 
 
-//			if((obj.getmID() != "" && obj.getmUserName()!="") 
-//					&& (gamesettings.getString("userCreated", "") == "" || gamesettings.getString("userCreated", "") != obj.getmUserName()) ){
-//
-//				Log.i("ThumbrSDK","Creating player (score api)");
-//				this.createPlayer();
-//			}		
+			//			if((obj.getmID() != "" && obj.getmUserName()!="") 
+			//					&& (gamesettings.getString("userCreated", "") == "" || gamesettings.getString("userCreated", "") != obj.getmUserName()) ){
+			//
+			//				Log.i("ThumbrSDK","Creating player (score api)");
+			//				this.createPlayer();
+			//			}		
 		}
 
 		return obj;
@@ -1296,47 +1325,48 @@ public class FunctionThumbrSDK {
 
 
 	public void getAdSettings() {
+		this.didLoginUser();
 		try {
 			SharedPreferences settings = mContext.getSharedPreferences("ThumbrSettings", Context.MODE_PRIVATE);
 			String sid = settings.getString("sid","");
-			String url = "http://ads.thumbr.com/adserver/?getAdSettings=1&debug=0&sid="+sid;
+			String url = "https://ads.thumbr.com/adserver/?getAdSettings=1&debug=0&sid="+sid;
 
-			 try {
-		            // defaultHttpClient
-		            DefaultHttpClient httpClient = new DefaultHttpClient();
-		            HttpGet httpGet = new HttpGet(url);
+			try {
+				// defaultHttpClient
+				DefaultHttpClient httpClient = new DefaultHttpClient();
+				HttpGet httpGet = new HttpGet(url);
 
-		            HttpResponse httpResponse = httpClient.execute(httpGet);
-		            HttpEntity httpEntity = httpResponse.getEntity();
-		            InputStream is = httpEntity.getContent();           
+				HttpResponse httpResponse = httpClient.execute(httpGet);
+				HttpEntity httpEntity = httpResponse.getEntity();
+				InputStream is = httpEntity.getContent();           
 
-		            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-		            try {
-		                String line;
-		                line = reader.readLine();
-		                     String[] RowData = line.split(",");
-		 					settings.edit().putInt("updateTimeIntervalOverride", Integer.parseInt(RowData[0])).commit();
-		                      Log.i("THUMBR","UPDATE TIME INTERVAL: "+RowData[0]);
-		                }
-		            catch (IOException ex) {
-		                // handle exception
-		            }
-		            finally {
-		                try {
-		                    is.close();
-		                }
-		                catch (IOException e) {
-		                    // handle exception
-		                }
-		            }		            
-		            
-		        } catch (UnsupportedEncodingException e) {
-		            e.printStackTrace();
-		        } catch (ClientProtocolException e) {
-		            e.printStackTrace();
-		        } catch (IOException e) {
-		            e.printStackTrace();
-		        }			
+				BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+				try {
+					String line;
+					line = reader.readLine();
+					String[] RowData = line.split(",");
+					settings.edit().putInt("updateTimeIntervalOverride", Integer.parseInt(RowData[0])).commit();
+					Log.i("THUMBR","UPDATE TIME INTERVAL: "+RowData[0]);
+				}
+				catch (IOException ex) {
+					// handle exception
+				}
+				finally {
+					try {
+						is.close();
+					}
+					catch (IOException e) {
+						// handle exception
+					}
+				}		            
+
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			} catch (ClientProtocolException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}			
 		} catch (Exception e) {
 			Log.i("THUMBR","Cannot update Ads time interval: "+e);
 		}
@@ -1377,41 +1407,77 @@ public class FunctionThumbrSDK {
 		SharedPreferences settings = mContext.getSharedPreferences("ThumbrSettings", Context.MODE_PRIVATE);
 
 		final MadsAdView adView = new MadsAdView(mContext, getAdSetting("interstitial","secret"), getAdSetting("interstitial","zoneid"));
-		adView.setAdserverURL("http://ads.thumbr.com/adserver/");
-		adView.setBackgroundColor(Color.TRANSPARENT);
+		adView.setAdserverURL("https://ads.thumbr.com/adserver/");
+		adView.setBackgroundColor(Color.BLACK);
 		adView.setId(1);
 		adView.setInternalBrowser(true);
 		adView.setContentAlignment(true);
 		adView.setLocationDetection(true);
 		adView.setMadsAdType("interstitial");
 		adView.setUpdateTime(0);
-		adView.setAutoCloseInterstitialTime(settings.getInt("autocloseInterstitialTime",600));
 		adView.setShowCloseButtonTime(settings.getInt("showCloseButtonTime",6));
 		adView.setEnableExpandInActivity(true);
-		ProfileObject user=didLoginUser();
-		if(user!=null){
-			adView.setZip(user.getmZipCode());
-			adView.setGender(user.getmGender());
-			adView.setAge(Integer.parseInt(user.getmAge()));
-			adView.setCity(user.getmCity());
-			adView.setCountry(user.getmCountry());
-			adView.setIncome(user.getmIncome());
-			Hashtable<String, Object> map = new Hashtable<String,Object>();
-			map.put("id",user.getmID());	
-			map.put("sid",settings.getString("sid",""));
-			map.put("client_id",settings.getString("client_id",""));
-			adView.setCustomParameters(map);
+
+		adView.setZip(settings.getString("zipcode",""));
+		adView.setGender(settings.getString("gender",""));
+		try{
+			adView.setAge(Integer.parseInt(settings.getString("age","")));
+		}
+		catch (Exception e) {
+			// TODO: handle exception
+		}
+		adView.setCity(settings.getString("city",""));
+		adView.setCountry(settings.getString("country",""));
+		Hashtable<String, Object> map = new Hashtable<String,Object>();
+		try{
+		map.put("id",URLEncoder.encode(settings.getString("id",""), "UTF-8"));	
+		map.put("sid",URLEncoder.encode(settings.getString("sid",""), "UTF-8"));
+		map.put("client_id",URLEncoder.encode(settings.getString("client_id",""), "UTF-8"));
+		map.put("handset_id",URLEncoder.encode(settings.getString("handset_id",""), "UTF-8"));
+		map.put("thumbr_id",URLEncoder.encode(settings.getString("thumbr_id",""), "UTF-8"));
+		map.put("profile_id",URLEncoder.encode(settings.getString("thumbr_id",""), "UTF-8"));		
+		map.put("address",URLEncoder.encode(settings.getString("address",""), "UTF-8"));
+		map.put("city",URLEncoder.encode(settings.getString("city",""), "UTF-8"));
+		map.put("country",URLEncoder.encode(settings.getString("country",""), "UTF-8"));
+		map.put("email",URLEncoder.encode(settings.getString("email",""), "UTF-8"));
+		map.put("firstname",URLEncoder.encode(settings.getString("firstname",""), "UTF-8"));
+		map.put("locale",URLEncoder.encode(settings.getString("locale",""), "UTF-8"));
+		map.put("msisdn",URLEncoder.encode(settings.getString("msisdn",""), "UTF-8"));
+		map.put("newsletter",URLEncoder.encode(settings.getString("newsletter",""), "UTF-8"));
+		map.put("status",URLEncoder.encode(settings.getString("status",""), "UTF-8"));
+		map.put("surname",URLEncoder.encode(settings.getString("surname",""), "UTF-8"));
+		map.put("username",URLEncoder.encode(settings.getString("username",""), "UTF-8"));
+		map.put("zipcode",URLEncoder.encode(settings.getString("zipcode",""), "UTF-8"));
+		map.put("gender",URLEncoder.encode(settings.getString("gender",""), "UTF-8"));
+		map.put("age",URLEncoder.encode(settings.getString("age",""), "UTF-8"));
+		map.put("date_of_birth",URLEncoder.encode(settings.getString("date_of_birth",""), "UTF-8"));
+		map.put("housenr",URLEncoder.encode(settings.getString("housenr",""), "UTF-8"));
+		map.put("token",URLEncoder.encode(settings.getString("token",""), "UTF-8"));
+		}catch (UnsupportedEncodingException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		try {
+			map.put("sig",getHash(theKey, settings.getString("thumbr_id", "")));
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}		
-		if(isOnline()){
+		adView.setCustomParameters(map);
+
+
+		if(isOnline() && getAdSetting("interstitial","zoneid") != ""){
 			adView.update();
 		}
 		else{return;}
 
 		WindowManager wm = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
 		Display display = wm.getDefaultDisplay();
-		Point size = new Point();
-		display.getSize(size);
-		int adHeight = size.y;
+
+		int adHeight = display.getHeight();
 		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) ad_view.getLayoutParams();
 		params.height = adHeight;
 		ad_view.setLayoutParams(params);
@@ -1420,16 +1486,53 @@ public class FunctionThumbrSDK {
 		adView.setAdExpandListener(new AdExpandListener() {
 			@Override
 			public void onExpand() {
-				ad_view.setBackgroundColor(Color.BLACK);
+				ad_view.setBackgroundColor(Color.TRANSPARENT);
 			}
 			@Override
 			public void onClose() {
-				ad_view.setBackgroundColor(Color.TRANSPARENT);
-				RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) ad_view.getLayoutParams();
-				params.height = 0;
-				ad_view.setLayoutParams(params);
+
+				Runnable mMyRunnable = new Runnable()
+				{
+					@Override
+					public void run()
+					{
+						ad_view.setBackgroundColor(Color.TRANSPARENT);
+						RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) ad_view.getLayoutParams();
+						params.height = 0;
+						ad_view.setLayoutParams(params);
+					}
+				};
+
 			}
 		});
+
+		adView.setOnAdDownload(new AdViewCore.OnAdDownload() 
+		{
+
+			@Override
+			public void begin(AdView sender) {
+
+			}
+
+			@Override
+			public void end(final AdView sender) 
+			{
+
+			}
+
+			@Override
+			public void error(AdView sender, String error) {
+				Log.e("MRAID", "Error in ad download phase: " + error);
+
+			}
+
+			@Override
+			public void noad(AdView sender) {
+				Log.d("MRAID", "The ad server responded by telling us no ad is available");
+
+			}
+		});		
+
 	}
 
 	public void adOverlay(final RelativeLayout ad_view){
@@ -1446,24 +1549,60 @@ public class FunctionThumbrSDK {
 		adView.setLocationDetection(true);
 		adView.setMadsAdType("overlay");
 		adView.setUpdateTime(0);
-		adView.setAutoCloseInterstitialTime(settings.getInt("autocloseInterstitialTime",600));
 		adView.setShowCloseButtonTime(settings.getInt("showCloseButtonTime",6));
+
 		adView.setEnableExpandInActivity(true);
-		ProfileObject user=didLoginUser();
-		if(user!=null){
-			adView.setZip(user.getmZipCode());
-			adView.setGender(user.getmGender());
-			adView.setAge(Integer.parseInt(user.getmAge()));
-			adView.setCity(user.getmCity());
-			adView.setCountry(user.getmCountry());
-			adView.setIncome(user.getmIncome());
-			Hashtable<String, Object> map = new Hashtable<String,Object>();
-			map.put("id",user.getmID());			
-			map.put("sid",settings.getString("sid",""));
-			map.put("client_id",settings.getString("client_id",""));
-			adView.setCustomParameters(map);
+		adView.setZip(settings.getString("zipcode",""));
+		adView.setGender(settings.getString("gender",""));
+		try{
+			adView.setAge(Integer.parseInt(settings.getString("age","")));
+		}
+		catch (Exception e) {
+			// TODO: handle exception
+		}
+		adView.setCity(settings.getString("city",""));
+		adView.setCountry(settings.getString("country",""));
+		Hashtable<String, Object> map = new Hashtable<String,Object>();
+		try{
+		map.put("id",URLEncoder.encode(settings.getString("id",""), "UTF-8"));	
+		map.put("sid",URLEncoder.encode(settings.getString("sid",""), "UTF-8"));
+		map.put("client_id",URLEncoder.encode(settings.getString("client_id",""), "UTF-8"));
+		map.put("handset_id",URLEncoder.encode(settings.getString("handset_id",""), "UTF-8"));
+		map.put("thumbr_id",URLEncoder.encode(settings.getString("thumbr_id",""), "UTF-8"));
+		map.put("profile_id",URLEncoder.encode(settings.getString("thumbr_id",""), "UTF-8"));		
+		map.put("address",URLEncoder.encode(settings.getString("address",""), "UTF-8"));
+		map.put("city",URLEncoder.encode(settings.getString("city",""), "UTF-8"));
+		map.put("country",URLEncoder.encode(settings.getString("country",""), "UTF-8"));
+		map.put("email",URLEncoder.encode(settings.getString("email",""), "UTF-8"));
+		map.put("firstname",URLEncoder.encode(settings.getString("firstname",""), "UTF-8"));
+		map.put("locale",URLEncoder.encode(settings.getString("locale",""), "UTF-8"));
+		map.put("msisdn",URLEncoder.encode(settings.getString("msisdn",""), "UTF-8"));
+		map.put("newsletter",URLEncoder.encode(settings.getString("newsletter",""), "UTF-8"));
+		map.put("status",URLEncoder.encode(settings.getString("status",""), "UTF-8"));
+		map.put("surname",URLEncoder.encode(settings.getString("surname",""), "UTF-8"));
+		map.put("username",URLEncoder.encode(settings.getString("username",""), "UTF-8"));
+		map.put("zipcode",URLEncoder.encode(settings.getString("zipcode",""), "UTF-8"));
+		map.put("gender",URLEncoder.encode(settings.getString("gender",""), "UTF-8"));
+		map.put("age",URLEncoder.encode(settings.getString("age",""), "UTF-8"));
+		map.put("date_of_birth",URLEncoder.encode(settings.getString("date_of_birth",""), "UTF-8"));
+		map.put("housenr",URLEncoder.encode(settings.getString("housenr",""), "UTF-8"));
+		map.put("token",URLEncoder.encode(settings.getString("token",""), "UTF-8"));
+		}catch (UnsupportedEncodingException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
 		}		
-		if(isOnline()){
+		try {
+			map.put("sig",getHash(theKey, settings.getString("thumbr_id", "")));
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
+		adView.setCustomParameters(map);
+
+		if(isOnline() && getAdSetting("overlay","zoneid") != ""){
 			adView.update();
 		}
 		else{
@@ -1476,13 +1615,76 @@ public class FunctionThumbrSDK {
 			}
 			@Override
 			public void onClose() {
-
+				Runnable mMyRunnable = new Runnable()
+				{
+					@Override
+					public void run()
+					{
+						ad_view.setBackgroundColor(Color.TRANSPARENT);
+						RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) ad_view.getLayoutParams();
+						params.height = 0;
+						ad_view.setLayoutParams(params);
+					}
+				};
 			}
 		});
+
+		adView.setOnAdDownload(new AdViewCore.OnAdDownload() 
+		{
+
+			@Override
+			public void begin(AdView sender) {
+
+			}
+
+			@Override
+			public void end(final AdView sender) 
+			{
+
+			}
+
+			@Override
+			public void error(AdView sender, String error) {
+				Log.e("MRAID", "Error in ad download phase: " + error);
+
+			}
+
+			@Override
+			public void noad(AdView sender) {
+				Log.d("MRAID", "The ad server responded by telling us no ad is available");
+
+			}
+		});		
+
 	}
 
+	public String getHash(String key,String id) throws NoSuchAlgorithmException, UnsupportedEncodingException{
+		
+		try{
+		MessageDigest md = MessageDigest.getInstance("SHA-256");
+		String text = key + ":" + id;
+		md.update(text.getBytes("UTF-8")); // Change this to "UTF-16" if needed
+		byte[] result = md.digest();
+		StringBuilder sb = new StringBuilder();
+
+		for (byte b : result) // This is your byte[] result..
+		{
+		    sb.append(String.format("%02x", b));
+		}
+		
+		return sb.toString();
+		
+		} catch (Exception e) {
+	        e.printStackTrace(System.err);
+	        return null;
+	    }
+	}
+	
+	@TargetApi(Build.VERSION_CODES.BASE)
+	@SuppressLint("NewApi")
 	public void adInline(final RelativeLayout ad_view)
 	{
+
 		ad_view.removeAllViews();		
 		SharedPreferences settings = mContext.getSharedPreferences("ThumbrSettings", Context.MODE_PRIVATE);
 
@@ -1491,7 +1693,7 @@ public class FunctionThumbrSDK {
 		}
 
 		final MadsAdView adView = new MadsAdView(mContext, getAdSetting("inline","secret"), getAdSetting("inline","zoneid"));
-		adView.setAdserverURL("http://ads.thumbr.com/adserver/");
+		adView.setAdserverURL("https://ads.thumbr.com/adserver/");
 		adView.setBackgroundColor(Color.TRANSPARENT);
 		adView.setId(1);
 		adView.setInternalBrowser(true);
@@ -1504,54 +1706,86 @@ public class FunctionThumbrSDK {
 		}else{
 			adView.setUpdateTime(settings.getInt("updateTimeInterval",0));
 		}
-		adView.setAutoCloseInterstitialTime(settings.getInt("autocloseInterstitialTime",600));
 		adView.setShowCloseButtonTime(settings.getInt("showCloseButtonTime",6));
 		adView.setEnableExpandInActivity(true);
 
-		ProfileObject user=didLoginUser();
-		if(user!=null){
-			try{
-			adView.setZip(user.getmZipCode());
-			adView.setGender(user.getmGender());
-			if(user.getmAge() != ""){
-			adView.setAge(Integer.parseInt(user.getmAge()));
-			}
-			adView.setCity(user.getmCity());
-			adView.setCountry(user.getmCountry());
-			adView.setIncome(user.getmIncome());
-			Hashtable<String, Object> map = new Hashtable<String,Object>();
-			map.put("id",user.getmID());
-			map.put("sid",settings.getString("sid",""));
-			map.put("client_id",settings.getString("client_id",""));
-			adView.setCustomParameters(map);
-			}
-			catch (Exception e) {
-				// TODO: handle exception
-			}
+		adView.setZip(settings.getString("zipcode",""));
+		adView.setGender(settings.getString("gender",""));
+		try{
+			adView.setAge(Integer.parseInt(settings.getString("age","")));
 		}
-		if(isOnline()){
+		catch (Exception e) {
+			// TODO: handle exception
+		}
+		adView.setCity(settings.getString("city",""));
+		adView.setCountry(settings.getString("country",""));
+		Hashtable<String, Object> map = new Hashtable<String,Object>();
+		try{
+		map.put("id",URLEncoder.encode(settings.getString("id",""), "UTF-8"));	
+		map.put("sid",URLEncoder.encode(settings.getString("sid",""), "UTF-8"));
+		map.put("client_id",URLEncoder.encode(settings.getString("client_id",""), "UTF-8"));
+		map.put("handset_id",URLEncoder.encode(settings.getString("handset_id",""), "UTF-8"));
+		map.put("thumbr_id",URLEncoder.encode(settings.getString("thumbr_id",""), "UTF-8"));
+		map.put("profile_id",URLEncoder.encode(settings.getString("thumbr_id",""), "UTF-8"));		
+		map.put("address",URLEncoder.encode(settings.getString("address",""), "UTF-8"));
+		map.put("city",URLEncoder.encode(settings.getString("city",""), "UTF-8"));
+		map.put("country",URLEncoder.encode(settings.getString("country",""), "UTF-8"));
+		map.put("email",URLEncoder.encode(settings.getString("email",""), "UTF-8"));
+		map.put("firstname",URLEncoder.encode(settings.getString("firstname",""), "UTF-8"));
+		map.put("locale",URLEncoder.encode(settings.getString("locale",""), "UTF-8"));
+		map.put("msisdn",URLEncoder.encode(settings.getString("msisdn",""), "UTF-8"));
+		map.put("newsletter",URLEncoder.encode(settings.getString("newsletter",""), "UTF-8"));
+		map.put("status",URLEncoder.encode(settings.getString("status",""), "UTF-8"));
+		map.put("surname",URLEncoder.encode(settings.getString("surname",""), "UTF-8"));
+		map.put("username",URLEncoder.encode(settings.getString("username",""), "UTF-8"));
+		map.put("zipcode",URLEncoder.encode(settings.getString("zipcode",""), "UTF-8"));
+		map.put("gender",URLEncoder.encode(settings.getString("gender",""), "UTF-8"));
+		map.put("age",URLEncoder.encode(settings.getString("age",""), "UTF-8"));
+		map.put("date_of_birth",URLEncoder.encode(settings.getString("date_of_birth",""), "UTF-8"));
+		map.put("housenr",URLEncoder.encode(settings.getString("housenr",""), "UTF-8"));
+		map.put("token",URLEncoder.encode(settings.getString("token",""), "UTF-8"));
+		}catch (UnsupportedEncodingException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		try {
+			map.put("sig",getHash(theKey, settings.getString("thumbr_id", "")));
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		adView.setCustomParameters(map);
+
+		if(isOnline() && getAdSetting("inline","zoneid") != ""){
 			adView.update();
 		}
 		else{
-			return;}
+			return;
+			}
 
 		RelativeLayout rl = new RelativeLayout(mContext);
+
 		RelativeLayout.LayoutParams lay = new RelativeLayout.LayoutParams(
 				RelativeLayout.LayoutParams.FILL_PARENT, 
 				RelativeLayout.LayoutParams.WRAP_CONTENT);
 
 		WindowManager wm = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
 		Display display = wm.getDefaultDisplay();
-		Point size = new Point();
-		display.getSize(size);
-		adView.setMaxwidth(size.x);
+
+		adView.setMaxwidth(display.getWidth());
 		int adHeight=56;
-		if(size.x > size.y){
-			adHeight = (int) ((size.x*0.6)/6);
+		if(display.getWidth() > display.getHeight()){
+			adHeight = (int) ((display.getWidth()*0.6)/6);
 		}
 		else{
-			adHeight = size.x/6;
+			adHeight = display.getWidth()/6;
 		}
+
 		adView.setMaxheight(adHeight);
 
 		//		if(ad_view.getBottom() <= 50){
@@ -1571,75 +1805,125 @@ public class FunctionThumbrSDK {
 			}
 			@Override
 			public void onClose() {
-
+				Runnable mMyRunnable = new Runnable()
+				{
+					@Override
+					public void run()
+					{
+						ad_view.setBackgroundColor(Color.TRANSPARENT);
+						RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) ad_view.getLayoutParams();
+						params.height = 0;
+						ad_view.setLayoutParams(params);
+					}
+				};
 			}
 		});
 
-		adView.setOnAdDownload(new AdViewCore.OnAdDownload() {
-
-			@Override
-			public void begin(AdView sender) {
-				if(isOnline())
-				{
-					Log.d("MRAID", "Beginning ad download");
-					Log.i("MRAID","settings: "+getAdSetting("inline","secret")+" :: "+getAdSetting("inline","zoneid"));
-					((Activity) mContext).runOnUiThread(new Runnable() {
-						public void run() {
-							final ValueAnimator va = ValueAnimator.ofInt((int)ad_view.getHeight(), 0);
-							va.setDuration(50);
-							va.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-								public void onAnimationUpdate(ValueAnimator animation) {
-									Integer value = (Integer) animation.getAnimatedValue();
-									ad_view.getLayoutParams().height = value.intValue();
-									ad_view.requestLayout();
-								}
-
-							});
-
-							Runnable mMyRunnable = new Runnable()
-							{
-								@Override
-								public void run()
-								{
-									va.start();
-								}
-							};
-							Handler myHandler = new Handler();
-							myHandler.postDelayed(mMyRunnable, 5);
-						}
-					});
-				}
+		if (android.os.Build.VERSION.SDK_INT < 11)
+		{
+			adView.setMaxwidth(display.getWidth());
+			int staticAdHeight=56;
+			if(display.getWidth() > display.getHeight()){
+				staticAdHeight = (int) ((display.getWidth()*0.6)/6.4);
 			}
-			@Override
-			public void end(final AdView sender) 
+			else{
+				staticAdHeight = (int) (display.getWidth()/6.4);
+			}			
+			ad_view.getLayoutParams().height=staticAdHeight;
+
+			adView.setOnAdDownload(new AdViewCore.OnAdDownload() 
 			{
-				if(isOnline())
+
+				@Override
+				public void begin(AdView sender) {
+
+				}
+
+				@Override
+				public void end(final AdView sender) 
 				{
 
-					((Activity) mContext).runOnUiThread(new Runnable() {
-						public void run() {
-							WindowManager wm = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
-							Display display = wm.getDefaultDisplay();
-							Point size = new Point();
-							display.getSize(size);
-							int adHeight=54;//for now.
+				}
 
-							if(size.x > size.y){
-								adHeight = (int) ((size.x*0.6)/6);
+				@Override
+				public void error(AdView sender, String error) {
+					Log.e("MRAID", "Error in ad download phase: " + error);
+
+				}
+
+				@Override
+				public void noad(AdView sender) {
+					Log.d("MRAID", "The ad server responded by telling us no ad is available");
+
+				}
+			});			
+			
+		}
+		else
+		{
+
+			adView.setOnAdDownload(new AdViewCore.OnAdDownload() 
+			{
+
+				@Override
+				public void begin(AdView sender) {
+					if(isOnline())
+					{
+						Log.d("MRAID", "Beginning ad download");
+						Log.i("MRAID","settings: "+getAdSetting("inline","secret")+" :: "+getAdSetting("inline","zoneid"));
+						((Activity) mContext).runOnUiThread(new Runnable() {
+							public void run() {
+								final ValueAnimator va = ValueAnimator.ofInt((int)ad_view.getHeight(), 0);
+								va.setDuration(50);
+								va.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+									public void onAnimationUpdate(ValueAnimator animation) {
+										Integer value = (Integer) animation.getAnimatedValue();
+										ad_view.getLayoutParams().height = value.intValue();
+										ad_view.requestLayout();
+									}
+
+								});
+
+								Runnable mMyRunnable = new Runnable()
+								{
+									@Override
+									public void run()
+									{
+										va.start();
+									}
+								};
+								Handler myHandler = new Handler();
+								myHandler.postDelayed(mMyRunnable, 5);
 							}
-							else{
-								adHeight = size.x/6;
-							}
+						});
+					}
+				}
+				@TargetApi(Build.VERSION_CODES.BASE)
+				@SuppressLint("NewApi")
+				@Override
+				public void end(final AdView sender) 
+				{
+					if(isOnline())
+					{
 
-							Log.e("MRAID","Ad height:"+adHeight);
-							if(ad_view.getLayoutParams().height < 50)
-							{
-								SharedPreferences settings = mContext.getSharedPreferences("ThumbrSettings", Context.MODE_PRIVATE);
-								int finalheight = settings.getInt("inlineAdHeight", adHeight);
+						((Activity) mContext).runOnUiThread(new Runnable() {
+							public void run() {
+								WindowManager wm = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
+								Display display = wm.getDefaultDisplay();
 
-								if(finalheight < 50){finalheight = adHeight;}
-								Log.i("MRAID","Final height: "+finalheight);
-								final ValueAnimator va = ValueAnimator.ofInt(0, finalheight);
+								int adHeight=54;//for now.
+
+								if(display.getWidth() > display.getHeight()){
+									adHeight = (int) ((display.getWidth()*0.6)/6.4);
+								}
+								else{
+									adHeight = (int) (display.getWidth()/6.4);
+								}
+
+								Log.e("MRAID","Ad height:"+adHeight);
+
+								Log.i("MRAID","Final height: "+adHeight);
+								final ValueAnimator va = ValueAnimator.ofInt(0, adHeight);
 								va.setDuration(500);
 								va.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
 									public void onAnimationUpdate(ValueAnimator animation) {
@@ -1661,69 +1945,55 @@ public class FunctionThumbrSDK {
 								Handler myHandler = new Handler();
 								myHandler.postDelayed(mMyRunnable, 1000);
 
-							}else{		
-
-								Runnable mMyRunnable = new Runnable()
-								{
-									@Override
-									public void run()
-									{
-										//									RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) ad_view.getLayoutParams();
-										//									params.height = LayoutParams.WRAP_CONTENT;
-										//ad_view.setLayoutParams(params);
-									}
-								};
-								Handler myHandler = new Handler();
-								myHandler.postDelayed(mMyRunnable, 500);							
-
-							}
-						}
-					});
-				}
-			}
-
-			@Override
-			public void error(AdView sender, String error) {
-				Log.e("MRAID", "Error in ad download phase: " + error);
-
-				if(isOnline()){((Activity) mContext).runOnUiThread(new Runnable() {
-					public void run() {
-						ValueAnimator va = ValueAnimator.ofInt((int)ad_view.getHeight(), 0);
-						va.setDuration(100);
-						va.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-							public void onAnimationUpdate(ValueAnimator animation) {
-								Integer value = (Integer) animation.getAnimatedValue();
-								ad_view.getLayoutParams().height = value.intValue();
-								ad_view.requestLayout();
 							}
 						});
-						va.start();
-					}});
+					}
 				}
-			}
 
-			@Override
-			public void noad(AdView sender) {
-				Log.d("MRAID", "The ad server responded by telling us no ad is available");
-				if(isOnline())
-				{
-					((Activity) mContext).runOnUiThread(new Runnable() {
-						public void run() {
-							ValueAnimator va = ValueAnimator.ofInt((int)ad_view.getHeight(), 0);
-							va.setDuration(100);
-							va.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-								public void onAnimationUpdate(ValueAnimator animation) {
-									Integer value = (Integer) animation.getAnimatedValue();
-									ad_view.getLayoutParams().height = value.intValue();
-									ad_view.requestLayout();
-								}
-							});
-							va.start();     
-						}});
+				@TargetApi(Build.VERSION_CODES.BASE)
+				@Override
+				public void error(AdView sender, String error) {
+					Log.e("MRAID", "Error in ad download phase: " + error);
+
+					if(isOnline()){
+						((Activity) mContext).runOnUiThread(new Runnable() {
+							public void run() {
+								ValueAnimator va = ValueAnimator.ofInt((int)ad_view.getHeight(), 0);
+								va.setDuration(100);
+								va.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+									public void onAnimationUpdate(ValueAnimator animation) {
+										Integer value = (Integer) animation.getAnimatedValue();
+										ad_view.getLayoutParams().height = value.intValue();
+										ad_view.requestLayout();
+									}
+								});
+								va.start();
+							}});
+					}
 				}
-			}
-		});
 
+				@Override
+				public void noad(AdView sender) {
+					Log.d("MRAID", "The ad server responded by telling us no ad is available");
+					if(isOnline())
+					{
+						((Activity) mContext).runOnUiThread(new Runnable() {
+							public void run() {
+								ValueAnimator va = ValueAnimator.ofInt((int)ad_view.getHeight(), 0);
+								va.setDuration(100);
+								va.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+									public void onAnimationUpdate(ValueAnimator animation) {
+										Integer value = (Integer) animation.getAnimatedValue();
+										ad_view.getLayoutParams().height = value.intValue();
+										ad_view.requestLayout();
+									}
+								});
+								va.start();     
+							}});
+					}
+				}
+			});
+		}
 	}
 }
 
