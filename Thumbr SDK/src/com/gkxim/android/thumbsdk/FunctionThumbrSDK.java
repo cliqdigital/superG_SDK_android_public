@@ -1329,7 +1329,7 @@ public class FunctionThumbrSDK {
 		try {
 			SharedPreferences settings = mContext.getSharedPreferences("ThumbrSettings", Context.MODE_PRIVATE);
 			String sid = settings.getString("sid","");
-			String url = "https://ads.thumbr.com/adserver/?getAdSettings=1&debug=0&sid="+sid;
+			String url = "https://m-dev.thumbr.com/adserver/?getAdSettings=1&debug=0&sid="+sid;
 
 			try {
 				// defaultHttpClient
@@ -1407,7 +1407,7 @@ public class FunctionThumbrSDK {
 		SharedPreferences settings = mContext.getSharedPreferences("ThumbrSettings", Context.MODE_PRIVATE);
 
 		final MadsAdView adView = new MadsAdView(mContext, getAdSetting("interstitial","secret"), getAdSetting("interstitial","zoneid"));
-		adView.setAdserverURL("https://ads.thumbr.com/adserver/");
+		adView.setAdserverURL("https://m-dev.thumbr.com/adserver/");
 		adView.setBackgroundColor(Color.BLACK);
 		adView.setId(1);
 		adView.setInternalBrowser(true);
@@ -1693,7 +1693,7 @@ public class FunctionThumbrSDK {
 		}
 
 		final MadsAdView adView = new MadsAdView(mContext, getAdSetting("inline","secret"), getAdSetting("inline","zoneid"));
-		adView.setAdserverURL("https://ads.thumbr.com/adserver/");
+		adView.setAdserverURL("https://m-dev.thumbr.com/adserver/");
 		adView.setBackgroundColor(Color.TRANSPARENT);
 		adView.setId(1);
 		adView.setInternalBrowser(true);

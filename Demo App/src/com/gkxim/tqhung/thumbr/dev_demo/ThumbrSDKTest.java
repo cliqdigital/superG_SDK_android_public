@@ -10,6 +10,7 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.util.Log;
 import android.view.Display;
 import android.view.View;
@@ -50,9 +51,9 @@ public class ThumbrSDKTest extends Activity implements OnClickListener,OnDismiss
 	private String action = "registration";
 	private String appsFlyerKey = "9ngR4oQcH5qz7qxcFb7ftd";	
 	private Boolean debug = false; //OPTIONALLY SWITCH TO 'true' DURING IMPLEMENTATION		
-	private String registerUrl = "http://gasp.thumbr.com/auth/authorize?";
-	private String switchUrl = "http://gasp.thumbr.com/auth/authorize?";
-	private String portalUrl = "http://m.thumbr.com?";
+	private String registerUrl = "https://gasp.thumbr.com/auth/authorize?";
+	private String switchUrl = "https://gasp.thumbr.com/auth/authorize?";
+	private String portalUrl = "https://m.thumbr.com?";
 	private String SDKLayout = "thumbr";
 	//AD SERVING SETTINGS
 	private int updateTimeInterval = 0;//number of seconds before Ad refresh
@@ -71,6 +72,7 @@ public class ThumbrSDKTest extends Activity implements OnClickListener,OnDismiss
 	private String phone_Interstitial_zoneid = "0383016058";
 	private String phone_Interstitial_secret = "978CF95935DBE01E";
 
+	
 	///LEAVE THESE VALUES EMPTY, UNLESS YOU KNOW WHAT YOU'RE DOING
 	private String country = "";//eg: DE or NL
 	private String locale = "";//eg: nl_NL or de_DE
@@ -88,9 +90,12 @@ public class ThumbrSDKTest extends Activity implements OnClickListener,OnDismiss
 		super.onResume();		
 	}
 
+	
 	@SuppressLint("NewApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {	
+		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+		StrictMode.setThreadPolicy(policy);
 
 		Locale l = Locale.getDefault();
 		if(country == ""){country = l.getCountry();}

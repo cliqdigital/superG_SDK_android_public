@@ -90,7 +90,13 @@ public class JSONHelper {
 		JSONObject producedObject = null;
 		
 		initURL(url);
-		connect();
+		
+		try {
+			connect();
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		
 		try {
 			res = convertStreamToString(in);
