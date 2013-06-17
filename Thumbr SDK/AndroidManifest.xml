@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.gkxim.android.thumbsdk"
-    android:versionCode="1103000"
-    android:versionName="1.1.0.3000" >
+    android:versionCode="203200"
+    android:versionName="2.0.32000" >
 
     <uses-sdk android:minSdkVersion="8" />
 
@@ -32,9 +32,5 @@
     <!-- These permissions are mandatory. Without these ad data can't be retrieved -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" >
     </uses-permission>
-
-    <activity
-        android:name="com.adgoji.mraid.adview.AdActivity"
-        android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode" />
 
 </manifest>

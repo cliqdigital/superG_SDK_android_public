@@ -16,6 +16,7 @@
 		</accessrules>
 	</classpathentry>
 	<classpathentry exported="true" kind="lib" path="libs/nineoldandroids-2.4.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="/Users/henri/Documents/Cliq/SDKs/__Android/Thumbr SDK/libs/ads.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/ads.jar"/>
+	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

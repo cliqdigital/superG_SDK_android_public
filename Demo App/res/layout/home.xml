@@ -7,7 +7,6 @@
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
-        android:layout_below="@+id/ad_view"
         android:background="@drawable/background" >
 
         <LinearLayout
@@ -23,8 +22,8 @@
                 style="?android:attr/buttonStyleSmall"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Inline Ad" />
+                android:text="Inline Ad"
+                android:textSize="@dimen/_15dp" />
 
             <Button
                 android:id="@+id/overlay"
@@ -32,7 +31,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Overlay Ad" />
+                android:text="Overlay Ad"
+                android:textSize="@dimen/_15dp" />
 
             <Button
                 android:id="@+id/interstitial"
@@ -40,7 +40,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Interstitial Ad" />
+                android:text="Interstitial Ad"
+                android:textSize="@dimen/_15dp" />
+
         </LinearLayout>
 
         <LinearLayout
@@ -86,7 +88,7 @@
 
             <RelativeLayout
             android:id="@+id/ad_view_interstitial"
-            android:layout_width="wrap_content"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:background="@color/transparent" >

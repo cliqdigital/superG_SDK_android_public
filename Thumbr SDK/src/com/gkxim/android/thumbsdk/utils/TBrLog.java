@@ -1,14 +1,10 @@
 package com.gkxim.android.thumbsdk.utils;
 
-import java.io.BufferedWriter; 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.UUID;
-
-import com.gkxim.android.thumbsdk.R;
-import com.gkxim.android.thumbsdk.R.id;
-import com.gkxim.android.thumbsdk.R.layout;
 
 import android.app.Activity;
 import android.content.Context;
@@ -21,6 +17,8 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.gkxim.android.thumbsdk.R;
 
 /**
  * 
@@ -38,8 +36,6 @@ public class TBrLog {
 	public static final int TMB_LOGTYPE_DEBUG = 1;
 	public static final int TMB_LOGTYPE_WARNING = 2;
 	public static final int TMB_LOGTYPE_ERROR = 3;
-	private static final int TMB_TOAST_DURATION = 500;
-
 	public static boolean bDebugging = true;
 	public static boolean bToastDebug = true;
 	private static Toast mToast = null;

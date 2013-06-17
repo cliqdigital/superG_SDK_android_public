@@ -6,19 +6,15 @@ package com.gkxim.android.thumbsdk.components;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.gkxim.android.thumbsdk.R;
-import com.gkxim.android.thumbsdk.R.id;
-import com.gkxim.android.thumbsdk.R.layout;
-import com.gkxim.android.thumbsdk.R.string;
-import com.gkxim.android.thumbsdk.utils.TBrLog;
-
+import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
+
+import com.gkxim.android.thumbsdk.R;
+import com.gkxim.android.thumbsdk.utils.TBrLog;
 
 /**
  * @author HP
@@ -28,6 +24,7 @@ public class ThumbrSDKActivity extends Activity {
 
 	private WebView mWebView;
 
+	@SuppressLint("SetJavaScriptEnabled")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -53,17 +50,6 @@ public class ThumbrSDKActivity extends Activity {
 			TBrLog.fl(0,
 					"Failed at: onCreate() of class ThumbrSDKActivity with exception: "
 							+ e.getMessage());
-		}
-	}
-
-	private class ThumbrWebViewClient extends WebViewClient {
-		@Override
-		public boolean shouldOverrideUrlLoading(WebView view, String url) {
-			Map<String, String> extraHeaders = new HashMap<String, String>();
-			  extraHeaders.put("X-Thumbr-Method", "sdk");
-			  extraHeaders.put("X-Thumbr-Version", getResources().getString(R.string.versionName));
-			view.loadUrl(url,extraHeaders);
-			return true;
 		}
 	}
 

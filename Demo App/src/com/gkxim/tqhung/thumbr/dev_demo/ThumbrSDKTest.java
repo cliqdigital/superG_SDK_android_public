@@ -21,10 +21,13 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
+
 import com.appsflyer.AppsFlyerLib;
 import com.gkxim.android.thumbsdk.FunctionThumbrSDK;
+import com.gkxim.android.thumbsdk.FunctionThumbrSDK.OnInterstitialCloseListener;
 import com.gkxim.android.thumbsdk.utils.ProfileObject;
 
+@SuppressLint("ShowToast")
 public class ThumbrSDKTest extends Activity implements OnClickListener,OnDismissListener{
 
 	/*
@@ -32,9 +35,9 @@ public class ThumbrSDKTest extends Activity implements OnClickListener,OnDismiss
 	 */
 
 	//APP SPECIFIC SETTINGS
-	private String sid = "com.thumbr.skijumping12free";
+	private String sid = "";
 	private String client_id = "84758475-476574";
-	private String score_game_id = "";
+
 
 	//DEFAULT GAME ORIENTATION (USED IN onDismiss() BELOW, TO SWITCH BACK AFTER SDK CLOSE)
 	private int gameOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
@@ -45,38 +48,39 @@ public class ThumbrSDKTest extends Activity implements OnClickListener,OnDismiss
 	//THUMBR BUTTON WIDTH/HEIGHT, RELATIVE TO SCREEN WIDTH (MAX. 120PX)
 	private double buttonWidth = 0.15;
 
-	/*
-	 * OTHER, MORE GENERIC SETTINGS (LEAVE AS IS)
-	 */
-	private String action = "registration";
-	private String appsFlyerKey = "9ngR4oQcH5qz7qxcFb7ftd";	
-	private Boolean debug = false; //OPTIONALLY SWITCH TO 'true' DURING IMPLEMENTATION		
-	private String registerUrl = "https://gasp.thumbr.com/auth/authorize?";
-	private String switchUrl = "https://gasp.thumbr.com/auth/authorize?";
-	private String portalUrl = "https://m.thumbr.com?";
-	private String SDKLayout = "thumbr";
+	
 	//AD SERVING SETTINGS
 	private int updateTimeInterval = 0;//number of seconds before Ad refresh
-	
 	private int showCloseButtonTime = 6;//Number of seconds before the Ad close button appears
-	private String tablet_Inline_zoneid = "1356888057";
-	private String tablet_Inline_secret = "20E1A8C6655F7D3E";
-	private String tablet_Overlay_zoneid = "3356907052";
-	private String tablet_Overlay_secret = "ADAA22CB6D2AFDD3";
+
+	private String tablet_Inline_zoneid = 		"1356888057";
+	private String tablet_Inline_secret = 		"20E1A8C6655F7D3E";
+	private String tablet_Overlay_zoneid = 		"3356907052";
+	private String tablet_Overlay_secret = 		"ADAA22CB6D2AFDD3";
 	private String tablet_Interstitial_zoneid = "7356917050";
 	private String tablet_Interstitial_secret = "CB45B76FE96C8896";
-	private String phone_Inline_zoneid = "6382999052";
-	private String phone_Inline_secret = "D3BEE91338ECEBC4";
-	private String phone_Overlay_zoneid = "8383057050";
-	private String phone_Overlay_secret = "A2E465BF955D25A5";
-	private String phone_Interstitial_zoneid = "0383016058";
-	private String phone_Interstitial_secret = "978CF95935DBE01E";
+	private String phone_Inline_zoneid = 		"0345893057";
+	private String phone_Inline_secret = 		"04F006733229C984";
+	private String phone_Overlay_zoneid = 		"7345907052";
+	private String phone_Overlay_secret = 		"AEAAA69F395BA8FA";
+	private String phone_Interstitial_zoneid = 	"9345913059";
+	private String phone_Interstitial_secret = 	"04B882960D362099";
 
-	
+	/*
+	 * OTHER, MORE GENERIC SETTINGS
+	 */
+	private String action = 		"registration";
+	private String appsFlyerKey = 	"9ngR4oQcH5qz7qxcFb7ftd";	
+	private Boolean debug = 		false; //OPTIONALLY SWITCH TO 'true' DURING IMPLEMENTATION		
+	private String registerUrl = 	"http://gasp.thumbr.com/auth/authorize?";
+	private String score_game_id = "";
+	private int hideThumbrCloseButton = 0;//hide the close button from the Thumbr Window? 1 or 0
+	private String SDKLayout = 		"thumbr";
+
 	///LEAVE THESE VALUES EMPTY, UNLESS YOU KNOW WHAT YOU'RE DOING
-	private String country = "";//eg: DE or NL
-	private String locale = "";//eg: nl_NL or de_DE
-	private String appsFlyerId="";
+	private String country = 		"";//eg: DE or NL
+	private String locale = 		"";//eg: nl_NL or de_DE
+	private String appsFlyerId =	"";
 	FunctionThumbrSDK thumbr;
 
 	@Override
@@ -90,10 +94,13 @@ public class ThumbrSDKTest extends Activity implements OnClickListener,OnDismiss
 		super.onResume();		
 	}
 
-	
-	@SuppressLint("NewApi")
+
+
+
+
+	@SuppressLint({ "NewApi", "ShowToast" })
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {	
+	protected void onCreate(Bundle savedInstanceState) {
 		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
 		StrictMode.setThreadPolicy(policy);
 
@@ -108,7 +115,8 @@ public class ThumbrSDKTest extends Activity implements OnClickListener,OnDismiss
 		SharedPreferences settings = this.getSharedPreferences("ThumbrSettings", Context.MODE_PRIVATE);
 		settings.edit().putString("score_game_id",score_game_id).commit();
 		settings.edit().putInt("updateTimeInterval", updateTimeInterval).commit();		
-		settings.edit().putInt("showCloseButtonTime", showCloseButtonTime).commit();	
+		settings.edit().putInt("showCloseButtonTime", showCloseButtonTime).commit();
+		settings.edit().putInt("hideThumbrCloseButton", hideThumbrCloseButton).commit();
 		settings.edit().putString("tablet_Inline_zoneid", tablet_Inline_zoneid).commit();		
 		settings.edit().putString("tablet_Inline_secret", tablet_Inline_secret).commit();		
 		settings.edit().putString("tablet_Overlay_zoneid", tablet_Overlay_zoneid).commit();		
@@ -132,7 +140,6 @@ public class ThumbrSDKTest extends Activity implements OnClickListener,OnDismiss
 		ImageButton bt=(ImageButton) findViewById(com.gkxim.tqhung.thumbr.demo.R.id.bt_re);
 		bt.setOnClickListener(this);
 
-
 		//CREATE AD BUTTON LISTENERS (FOR DEMO ONLY)
 		Button bt_inline=(Button) findViewById(com.gkxim.tqhung.thumbr.demo.R.id.inline);
 		bt_inline.setOnClickListener(this);
@@ -151,9 +158,36 @@ public class ThumbrSDKTest extends Activity implements OnClickListener,OnDismiss
 		thumbr.setLinkRegister(registerUrl+"response_type=token&country="+country+"&locale="+locale+"&sid="+sid+"&client_id="+client_id+"&handset_id="+appsFlyerId);			
 		thumbr.adInit();//initialize Ads if you are showing Thumbr Ads
 
-
+		if( FunctionThumbrSDK.isTabletDevice(this) == true) {
+			//this is a tablet
+			gameOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
+			setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+			thumbrSDKOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
+		}else{
+			//this is not a tablet
+			gameOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
+			setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+			thumbrSDKOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
+		}
+		
 		//DISABLE FOLLOWING LINE NOT TO OPEN THE WINDOW ON APP STARTUP
 		//thumbr.buttonREGISTER();
+		
+
+		/* Interstitial advertisement close listener
+		   If you use the thumbr.adInterstitial(ad_view) method, you can use this listener to know when it closes. 
+		*/
+		
+		thumbr.setInterstitialCloseListener(new OnInterstitialCloseListener(){
+			public void onEvent(){
+				Log.i("ThumbrSDK","The interstitial advertisement was closed. You can resume your game.");
+				Toast.makeText(getApplicationContext(), "The game has been notified about closing the interstitial", 6000).show();
+				//resumeYourGame();
+			}
+		});		
+		
+
+		
 	}
 
 	@Override
@@ -201,6 +235,7 @@ public class ThumbrSDKTest extends Activity implements OnClickListener,OnDismiss
 
 	} 
 
+
 	/*
 	 * THIS FUNCTION IS CALLED WHEN THE THUMBR SDK WINDOW CLOSES.
 	 */
@@ -217,6 +252,7 @@ public class ThumbrSDKTest extends Activity implements OnClickListener,OnDismiss
 	} 
 
 	//EXAMPLE FUNCTION OF RETURN VALUES
+	@SuppressLint("ShowToast")
 	public void getUserData(){
 		ProfileObject ojb=thumbr.didLoginUser();            
 		if(ojb!=null){
@@ -244,7 +280,8 @@ public class ThumbrSDKTest extends Activity implements OnClickListener,OnDismiss
 		}else{
 			if(debug == true){Toast.makeText(this,"Not logged in yet...", 4000).show();}                
 		}
-	}       
+	}
+
 
 
 }

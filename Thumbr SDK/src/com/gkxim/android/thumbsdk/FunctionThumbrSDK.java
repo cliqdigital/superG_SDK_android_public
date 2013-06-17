@@ -5,8 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Array;
 import java.net.URLEncoder;
+import java.security.KeyManagementException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -18,6 +18,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.TreeMap;
+
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -39,8 +44,11 @@ import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -49,7 +57,6 @@ import android.content.pm.ActivityInfo;
 import android.content.res.AssetManager;
 import android.content.res.XmlResourceParser;
 import android.graphics.Color;
-import android.graphics.Point;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
@@ -57,14 +64,22 @@ import android.os.Handler;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.Display;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.webkit.CookieManager;
+import android.webkit.JavascriptInterface;
+import android.webkit.WebSettings;
+import android.widget.ImageButton;
+import android.widget.ImageView.ScaleType;
 import android.widget.RelativeLayout;
 
 import com.MadsAdView.MadsAdView;
-import com.adgoji.mraid.adview.AdExpandListener;
 import com.adgoji.mraid.adview.AdView;
 import com.adgoji.mraid.adview.AdViewCore;
+import com.adgoji.mraid.adview.AdViewCore.MadsOnOrmmaListener;
+import com.adgoji.mraid.jsbridge.listeners.AdExpandListener;
 import com.appsflyer.AppsFlyerLib;
 import com.gkxim.android.thumbsdk.components.ThumbrWebViewDialog;
 import com.gkxim.android.thumbsdk.utils.APIServer;
@@ -74,45 +89,40 @@ import com.gkxim.android.thumbsdk.utils.WSLoginListener;
 import com.gkxim.android.thumbsdk.utils.WSRegisterListener;
 import com.gkxim.android.thumbsdk.utils.WSStateCode;
 import com.gkxim.android.thumbsdk.utils.WSSwitchListener;
-import com.nineoldandroids.animation.*;
-import com.nineoldandroids.util.*;
-import com.nineoldandroids.view.*;
-import com.nineoldandroids.view.animation.*;
+
+
+
+
 
 @TargetApi(Build.VERSION_CODES.BASE)
-@SuppressLint("NewApi")
-public class FunctionThumbrSDK {
+@SuppressLint({ "NewApi", "SetJavaScriptEnabled" })
+public class FunctionThumbrSDK implements OnCancelListener,MadsOnOrmmaListener{
 
 	private static Context mContext;
-	private WSLoginListener loginListener=null;	
-	private WSRegisterListener registerListener=null;
 	private WSSwitchListener switchListener=null;
 	private ThumbrWebViewDialog mDialog;
 	public static final String VALID_LOGINED = "Valid";
 	public static final String LOGINED = "Logined";
 	public static final String ACCESSTOKEN = "";
 	public int requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_USER;
-	private boolean isRequestedOrientation = false;
 	public static final int Density_TV = 213;
 	public static final int Density_XHIGH = 320;
 	public static final int SIZE_XLARGE = 4;
-	private int sid = 0;
-	private int oldOrientation;
 	private String mThumbrId, mGameId;
 	private boolean isShowbutonClose = true;
 	private boolean isConfigchange_orientation = false;
-	
-	public static final int MY_ORIENTATION = 0x0080;
-	private static final int MODE_WORLD_READABLE = 1;
 
+	public static final int MY_ORIENTATION = 0x0080;
 	private String linkRegister = "";
 	private String linkSwitch = "";
 	private String linkPortal = "";
 	private String theKey = "49b26e3ac8701cf4c5840587d1d5e6eba01ab329b9179f6aef925f362a98065f";
-	
+
 	private OnScoreSavedListener onScoreSavedListener;
 	private String SDKLayout;
 	protected MadsAdView adView;
+	public OnInterstitialCloseListener mListener;
+	private Object ad_view;
 
 	public interface OnScoreSavedListener {
 		public void onScoreSaved(List<NameValuePair> returnlist);
@@ -125,6 +135,25 @@ public class FunctionThumbrSDK {
 	}
 
 
+	private TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager()
+	{
+		public java.security.cert.X509Certificate[] getAcceptedIssuers()
+		{
+			return null;
+		}
+
+		public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType)
+		{
+
+		}
+
+		public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType)
+		{
+
+		}
+	}
+	};
+	private boolean closeButtonClosed;
 	/**
 	 * 
 	 * @param context
@@ -132,24 +161,41 @@ public class FunctionThumbrSDK {
 	 *            :identifies the game and is mandatory
 	 */
 	public FunctionThumbrSDK(Context context, int sid) {
+		this.closeButtonClosed = false;
+		System.setProperty("http.keepAlive", "false");
+		SSLContext sc;
+		try {
+			sc = SSLContext.getInstance("TLS");
+			sc.init(null, trustAllCerts, new java.security.SecureRandom());
+			HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (KeyManagementException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 		mContext = context;
 		linkRegister = APIServer.getURLRegister(sid, (Activity) context);	
 		linkSwitch = APIServer.getURLSwitchAccount(sid, (Activity) context);
 		linkPortal = APIServer.getURLPrtal();
-		this.sid = sid;
-		boolean table = isTabletDevice(context);
 		check_importConfichange();
 		mThumbrId = TBrLog.createThumbrID((Activity) mContext);
 		mGameId = TBrLog.createGameID((Activity) mContext);
 		IntentFilter intentFilter = new IntentFilter();
 		intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
 		context.registerReceiver(new NetworkState(), intentFilter);
-		initScores();
+		//initScores();
+		
 		if(isOnline()){
 			getAdSettings();
 		}
+
+
 		Log.i("ThumbrSDK", "Thumbr initialized");
 	}
+
 
 
 
@@ -256,7 +302,9 @@ public class FunctionThumbrSDK {
 	}
 
 	private void ShowDialog(String link) {
-
+		//SET THE REQUESTED ORIENTATION
+		//((Activity) mContext).setRequestedOrientation(requestedOrientation);
+		
 		//attach action to link
 		link = link + "&action=" + this.getAction() + "&sdk=1&count=" + getCount();
 
@@ -267,8 +315,7 @@ public class FunctionThumbrSDK {
 		mDialog.setURL(link);// mContext.getResources().getString(R.string.Loginlink));
 		mDialog.show();
 
-		//SET THE REQUESTED ORIENTATION
-		((Activity) mContext).setRequestedOrientation(requestedOrientation);
+
 
 	}
 
@@ -407,24 +454,23 @@ public class FunctionThumbrSDK {
 	 */
 	public void setOrientation(int requestedOrientation) {
 		this.requestedOrientation = requestedOrientation;
-		isRequestedOrientation = true;
 	}
 
-	private static boolean isTabletDevice(Context activityContext) {
+	public static boolean isTabletDevice(Context activityContext) {
 		TelephonyManager manager = (TelephonyManager)mContext.getSystemService(Context.TELEPHONY_SERVICE);
 		WindowManager wm = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
 		Display display = wm.getDefaultDisplay();
 
 		if (manager.getPhoneType() == TelephonyManager.PHONE_TYPE_NONE && display.getWidth() >= 728 ) {
-			// Yes, this is a tablet!
-			//	Log.i("MRAID","I'm a tablet, I'm a tablet!!");
+			// True, this is a tablet!
 			return true;
 		}
-		//Log.i("MRAID","I'm a phone, I'm a phone!!");
-		// No, this is not a tablet!
+		// False, this is not a tablet!
 		return false;
 	}
 
+	
+	
 	public boolean isLogined() {
 		boolean flag = mContext.getSharedPreferences(FunctionThumbrSDK.LOGINED,
 				Context.MODE_PRIVATE).getBoolean(LOGINED, false);
@@ -437,7 +483,6 @@ public class FunctionThumbrSDK {
 	 */
 	// Allows the user to set a Login Listener and react to the event
 	public void setOnLoginListener(WSLoginListener loginlistener) {
-		this.loginListener = loginlistener;
 	}
 
 	/*
@@ -445,7 +490,6 @@ public class FunctionThumbrSDK {
 	 */
 	// Allows the user to set a Registers Listener and react to the event
 	public void setOnRegistersListener(WSRegisterListener registerlistener) {
-		registerListener = registerlistener;
 	}
 	/*
 	 * ******Just added ****
@@ -462,6 +506,7 @@ public class FunctionThumbrSDK {
 	}
 
 	public ProfileObject didLoginUser(){
+		@SuppressWarnings("unused")
 		SharedPreferences gamesettings = mContext.getSharedPreferences("ThumbrScoreSettings", Context.MODE_PRIVATE);        
 
 		APIServer sver=new APIServer(mContext);
@@ -558,8 +603,6 @@ public class FunctionThumbrSDK {
 
 		HttpClient client = new DefaultHttpClient();
 		HttpConnectionParams.setConnectionTimeout(client.getParams(), 10000); //Timeout Limit
-		HttpResponse response;
-
 		List<NameValuePair> returnlist = new ArrayList<NameValuePair>(2);
 
 		SharedPreferences settings = mContext.getSharedPreferences("ThumbrSettings", Context.MODE_PRIVATE);
@@ -633,6 +676,7 @@ public class FunctionThumbrSDK {
 				//parse JSON 
 				JSONObject jObject = new JSONObject(result.trim());
 
+				@SuppressWarnings("unchecked")
 				Iterator<String> ObjectKeys = jObject.keys();
 
 				while(ObjectKeys.hasNext()){
@@ -650,12 +694,12 @@ public class FunctionThumbrSDK {
 					else{
 						JSONObject gameObject = jObject.getJSONObject(ObjectKey);
 
+						@SuppressWarnings("unchecked")
 						Iterator<String> keys = gameObject.keys();
 						while(keys.hasNext()){
 							String key = keys.next().toString();
 							String value = gameObject.get(key).toString(); 
 							returnlist.add(new BasicNameValuePair(key, value));
-							//Log.i("ThumbrSDK",key+" = "+value);
 						}
 					}    	
 
@@ -701,7 +745,6 @@ public class FunctionThumbrSDK {
 
 		Map<String, ?> allStoredGameActions = storedGameActions.getAll();
 		if(allStoredGameActions != null){
-			Array[] Array;
 			for (Entry<String, ?> entry : allStoredGameActions.entrySet()) {
 				String key = entry.getKey();
 				String value = entry.getValue().toString();     	        
@@ -710,6 +753,7 @@ public class FunctionThumbrSDK {
 					JSONObject jObject = new JSONObject(value);
 					Map<String,String> map = new HashMap<String,String>();
 
+					@SuppressWarnings("unchecked")
 					Iterator<String> iter = jObject.keys();
 					while(iter.hasNext()){
 						String key2 = iter.next();
@@ -735,8 +779,6 @@ public class FunctionThumbrSDK {
 		if(settings.getString("initialized", "").equals("1")==false){
 			try {
 				String json = this.ReadFromfile("gamesettings.json",mContext);
-				Iterator<String> myIter;
-
 				JSONObject jObject = new JSONObject(json);
 				//INIT SCORES
 				JSONObject scores = (JSONObject) jObject.get("scores");
@@ -809,6 +851,7 @@ public class FunctionThumbrSDK {
 
 				JSONObject all_assets = assets.getJSONObject("assets");
 
+				@SuppressWarnings("unchecked")
 				Iterator<String> keys = all_assets.keys();
 				while(keys.hasNext()){
 					String key = keys.next().toString();
@@ -1250,7 +1293,7 @@ public class FunctionThumbrSDK {
 		BufferedReader input = null;
 		try {
 			fIn = context.getResources().getAssets()
-					.open(fileName, context.MODE_WORLD_READABLE);
+					.open(fileName, Context.MODE_WORLD_READABLE);
 			isr = new InputStreamReader(fIn);
 			input = new BufferedReader(isr);
 			String line = "";
@@ -1313,30 +1356,39 @@ public class FunctionThumbrSDK {
 		MadsAdView.resume();
 	}
 
-	public boolean isOnline() {
-		ConnectivityManager cm =
-				(ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
-		NetworkInfo netInfo = cm.getActiveNetworkInfo();
-		if (netInfo != null && netInfo.isConnectedOrConnecting() && mContext.getSharedPreferences("ThumbrSettings",Context.MODE_PRIVATE).getBoolean("isOnline",false) == true) {
-			return true;
-		}
-		return false;
+	public boolean isOnline() {Log.i("ThumbrSDK","isOnline");
+	ConnectivityManager cm =
+			(ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+	NetworkInfo netInfo = cm.getActiveNetworkInfo();
+
+	if (netInfo != null && netInfo.isConnectedOrConnecting() && mContext.getSharedPreferences("ThumbrSettings",Context.MODE_PRIVATE).getBoolean("isOnline",false) == true) {
+		return true;
+	}
+	return false;
 	}
 
 
 	public void getAdSettings() {
-		this.didLoginUser();
 		try {
+			this.didLoginUser();
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		try {
+
 			SharedPreferences settings = mContext.getSharedPreferences("ThumbrSettings", Context.MODE_PRIVATE);
 			String sid = settings.getString("sid","");
-			String url = "https://m-dev.thumbr.com/adserver/?getAdSettings=1&debug=0&sid="+sid;
+			String url = "http://ads.thumbr.com/adserver/?getAdSettings=1&debug=0&sid="+sid;
+			Log.i("ThumbrSDK","Get adsettings from: "+url);
 
 			try {
 				// defaultHttpClient
 				DefaultHttpClient httpClient = new DefaultHttpClient();
-				HttpGet httpGet = new HttpGet(url);
 
+				HttpGet httpGet = new HttpGet(url);
 				HttpResponse httpResponse = httpClient.execute(httpGet);
+
 				HttpEntity httpEntity = httpResponse.getEntity();
 				InputStream is = httpEntity.getContent();           
 
@@ -1345,20 +1397,33 @@ public class FunctionThumbrSDK {
 					String line;
 					line = reader.readLine();
 					String[] RowData = line.split(",");
+					if(RowData[0] != null){
 					settings.edit().putInt("updateTimeIntervalOverride", Integer.parseInt(RowData[0])).commit();
-					Log.i("THUMBR","UPDATE TIME INTERVAL: "+RowData[0]);
+					}
+
+					if(RowData[1] != null){
+					settings.edit().putInt("showCloseButtonTime", Integer.parseInt(RowData[1])).commit();
+					}
+					else{
+						settings.edit().putInt("showCloseButtonTime", settings.getInt("showCloseButtonTime",6)).commit();	
+					}
+					
+					if(RowData[2] != null){
+					settings.edit().putInt("hideThumbrCloseButton", Integer.parseInt(RowData[2])).commit();
+					}
+					else{
+						settings.edit().putInt("hideThumbrCloseButton", settings.getInt("hideThumbrCloseButton", 0)).commit();	
+					}
+					
+					Log.i("ThumbrSDK","INLINE ADS UPDATE TIME INTERVAL: "+RowData[0]);
+					Log.i("ThumbrSDK","INTERSTITIAL ADS SHOW CLOSE BUTTON AFER N SECONDS: "+RowData[1]);
+					Log.i("ThumbrSDK","HIDE THUMBR WINDOW CLOSEBUTTON: "+RowData[2]);
 				}
 				catch (IOException ex) {
 					// handle exception
+					Log.i("ThumbrSDK","Cannot read settings");
 				}
-				finally {
-					try {
-						is.close();
-					}
-					catch (IOException e) {
-						// handle exception
-					}
-				}		            
+	            
 
 			} catch (UnsupportedEncodingException e) {
 				e.printStackTrace();
@@ -1402,21 +1467,72 @@ public class FunctionThumbrSDK {
 		return "";
 	}
 
+	public interface OnInterstitialCloseListener{
+		public void onEvent();
+	}
+
+	public void setInterstitialCloseListener(OnInterstitialCloseListener eventListener) {
+		mListener=eventListener;
+	}
+
+	@Override
+	public void onCancel(DialogInterface dialog) {
+
+		((ViewGroup) this.ad_view).removeAllViews();
+	}
+	
+	
+	@SuppressLint("SetJavaScriptEnabled")
+	@JavascriptInterface
 	public void adInterstitial(final RelativeLayout ad_view){
 
-		SharedPreferences settings = mContext.getSharedPreferences("ThumbrSettings", Context.MODE_PRIVATE);
+
+		final ProgressDialog progress = ProgressDialog.show(mContext, "","loading...", false,false,(OnCancelListener) this);
+		this.ad_view=ad_view;
+		Runnable mMyRunnable = new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				progress.setCancelable(true);
+			}
+		};
+		Handler myHandler = new Handler();
+		myHandler.postDelayed(mMyRunnable, 5000);
+
+
+		final WindowManager wm = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
+		Display display = wm.getDefaultDisplay();
+
+
+		int adHeight = display.getHeight();
+		int adWidth = display.getWidth();
+		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) ad_view.getLayoutParams();
+		params.height = adHeight;
+		params.width = adWidth;
+		ad_view.setLayoutParams(params);
+
+		final SharedPreferences settings = mContext.getSharedPreferences("ThumbrSettings", Context.MODE_PRIVATE);
 
 		final MadsAdView adView = new MadsAdView(mContext, getAdSetting("interstitial","secret"), getAdSetting("interstitial","zoneid"));
-		adView.setAdserverURL("https://m-dev.thumbr.com/adserver/");
-		adView.setBackgroundColor(Color.BLACK);
-		adView.setId(1);
+		WebSettings aWS = adView.getSettings();
+		aWS.setJavaScriptCanOpenWindowsAutomatically(true);
+		aWS.setJavaScriptEnabled(true);
+		
+
+
+		adView.addJavascriptInterface(this, "CUSTOMANDROID");		
+
+		adView.setAdserverURL("http://ads.thumbr.com/adserver/");
+
+		adView.setId(9875737);
 		adView.setInternalBrowser(true);
 		adView.setContentAlignment(true);
 		adView.setLocationDetection(true);
 		adView.setMadsAdType("interstitial");
 		adView.setUpdateTime(0);
-		adView.setShowCloseButtonTime(settings.getInt("showCloseButtonTime",6));
-		adView.setEnableExpandInActivity(true);
+		//adView.setShowCloseButtonTime(settings.getInt("showCloseButtonTime",6));
+		adView.setEnableExpandInActivity(false);
 
 		adView.setZip(settings.getString("zipcode",""));
 		adView.setGender(settings.getString("gender",""));
@@ -1430,29 +1546,29 @@ public class FunctionThumbrSDK {
 		adView.setCountry(settings.getString("country",""));
 		Hashtable<String, Object> map = new Hashtable<String,Object>();
 		try{
-		map.put("id",URLEncoder.encode(settings.getString("id",""), "UTF-8"));	
-		map.put("sid",URLEncoder.encode(settings.getString("sid",""), "UTF-8"));
-		map.put("client_id",URLEncoder.encode(settings.getString("client_id",""), "UTF-8"));
-		map.put("handset_id",URLEncoder.encode(settings.getString("handset_id",""), "UTF-8"));
-		map.put("thumbr_id",URLEncoder.encode(settings.getString("thumbr_id",""), "UTF-8"));
-		map.put("profile_id",URLEncoder.encode(settings.getString("thumbr_id",""), "UTF-8"));		
-		map.put("address",URLEncoder.encode(settings.getString("address",""), "UTF-8"));
-		map.put("city",URLEncoder.encode(settings.getString("city",""), "UTF-8"));
-		map.put("country",URLEncoder.encode(settings.getString("country",""), "UTF-8"));
-		map.put("email",URLEncoder.encode(settings.getString("email",""), "UTF-8"));
-		map.put("firstname",URLEncoder.encode(settings.getString("firstname",""), "UTF-8"));
-		map.put("locale",URLEncoder.encode(settings.getString("locale",""), "UTF-8"));
-		map.put("msisdn",URLEncoder.encode(settings.getString("msisdn",""), "UTF-8"));
-		map.put("newsletter",URLEncoder.encode(settings.getString("newsletter",""), "UTF-8"));
-		map.put("status",URLEncoder.encode(settings.getString("status",""), "UTF-8"));
-		map.put("surname",URLEncoder.encode(settings.getString("surname",""), "UTF-8"));
-		map.put("username",URLEncoder.encode(settings.getString("username",""), "UTF-8"));
-		map.put("zipcode",URLEncoder.encode(settings.getString("zipcode",""), "UTF-8"));
-		map.put("gender",URLEncoder.encode(settings.getString("gender",""), "UTF-8"));
-		map.put("age",URLEncoder.encode(settings.getString("age",""), "UTF-8"));
-		map.put("date_of_birth",URLEncoder.encode(settings.getString("date_of_birth",""), "UTF-8"));
-		map.put("housenr",URLEncoder.encode(settings.getString("housenr",""), "UTF-8"));
-		map.put("token",URLEncoder.encode(settings.getString("token",""), "UTF-8"));
+			map.put("id",URLEncoder.encode(settings.getString("id",""), "UTF-8"));	
+			map.put("sid",URLEncoder.encode(settings.getString("sid",""), "UTF-8"));
+			map.put("client_id",URLEncoder.encode(settings.getString("client_id",""), "UTF-8"));
+			map.put("handset_id",URLEncoder.encode(settings.getString("handset_id",""), "UTF-8"));
+			map.put("thumbr_id",URLEncoder.encode(settings.getString("thumbr_id",""), "UTF-8"));
+			map.put("profile_id",URLEncoder.encode(settings.getString("thumbr_id",""), "UTF-8"));		
+			map.put("address",URLEncoder.encode(settings.getString("address",""), "UTF-8"));
+			map.put("city",URLEncoder.encode(settings.getString("city",""), "UTF-8"));
+			map.put("country",URLEncoder.encode(settings.getString("country",""), "UTF-8"));
+			map.put("email",URLEncoder.encode(settings.getString("email",""), "UTF-8"));
+			map.put("firstname",URLEncoder.encode(settings.getString("firstname",""), "UTF-8"));
+			map.put("locale",URLEncoder.encode(settings.getString("locale",""), "UTF-8"));
+			map.put("msisdn",URLEncoder.encode(settings.getString("msisdn",""), "UTF-8"));
+			map.put("newsletter",URLEncoder.encode(settings.getString("newsletter",""), "UTF-8"));
+			map.put("status",URLEncoder.encode(settings.getString("status",""), "UTF-8"));
+			map.put("surname",URLEncoder.encode(settings.getString("surname",""), "UTF-8"));
+			map.put("username",URLEncoder.encode(settings.getString("username",""), "UTF-8"));
+			map.put("zipcode",URLEncoder.encode(settings.getString("zipcode",""), "UTF-8"));
+			map.put("gender",URLEncoder.encode(settings.getString("gender",""), "UTF-8"));
+			map.put("age",URLEncoder.encode(settings.getString("age",""), "UTF-8"));
+			map.put("date_of_birth",URLEncoder.encode(settings.getString("date_of_birth",""), "UTF-8"));
+			map.put("housenr",URLEncoder.encode(settings.getString("housenr",""), "UTF-8"));
+			map.put("token",URLEncoder.encode(settings.getString("token",""), "UTF-8"));
 		}catch (UnsupportedEncodingException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -1474,35 +1590,22 @@ public class FunctionThumbrSDK {
 		}
 		else{return;}
 
-		WindowManager wm = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
-		Display display = wm.getDefaultDisplay();
 
-		int adHeight = display.getHeight();
-		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) ad_view.getLayoutParams();
-		params.height = adHeight;
-		ad_view.setLayoutParams(params);
 
 		ad_view.addView(adView);
 		adView.setAdExpandListener(new AdExpandListener() {
 			@Override
 			public void onExpand() {
-				ad_view.setBackgroundColor(Color.TRANSPARENT);
+
 			}
 			@Override
 			public void onClose() {
-
-				Runnable mMyRunnable = new Runnable()
-				{
-					@Override
-					public void run()
-					{
-						ad_view.setBackgroundColor(Color.TRANSPARENT);
-						RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) ad_view.getLayoutParams();
-						params.height = 0;
-						ad_view.setLayoutParams(params);
-					}
-				};
-
+				ad_view.removeAllViews();
+				ad_view.setBackgroundColor(Color.TRANSPARENT);
+				RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) ad_view.getLayoutParams();
+				params.height = 0;
+				ad_view.setLayoutParams(params);
+				if(mListener!=null) {mListener.onEvent();}
 			}
 		});
 
@@ -1516,20 +1619,100 @@ public class FunctionThumbrSDK {
 
 			@Override
 			public void end(final AdView sender) 
-			{
+			{		
+				adView.loadUrl("javascript:(function() {" + "if (typeof mraid !== 'undefined') {var oldVersion = mraid.close;mraid.close = function() {var result = oldVersion.apply(this, arguments);CUSTOMANDROID.closeListen(); return result;}};" +  "})()");
+				
+				//after 1 second do stuff
+				final Handler handler = new Handler();
+				handler.postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						adView.loadUrl("javascript:(function() {" + "if (typeof mraid !== 'undefined') {if(mraid.getExpandProperties().useCustomClose == true){CUSTOMANDROID.hideNativeCloseButton();}else{CUSTOMANDROID.showNativeCloseButton();}};" +  "})()");
+						progress.dismiss();
+						ad_view.setBackgroundColor(Color.parseColor("#AA000000"));
+					}
+				}, 1000);
+				
+				//after x seconds, show the close button (if not cancelled by mraid CustomButton)
+				final Handler handler2 = new Handler();
+				handler2.postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						adView.loadUrl("javascript:(function() {" + "if (typeof mraid !== 'undefined') {if(mraid.getExpandProperties().useCustomClose == true){CUSTOMANDROID.hideNativeCloseButton();}else{CUSTOMANDROID.showNativeCloseButton();}};" +  "})()");
+						
+						progress.dismiss();
+						ad_view.setBackgroundColor(Color.TRANSPARENT);
+						
+						//WE ADD OUR OWN CLOSE BUTTON TO THE INTERSTITIAL, BECAUSE WE CAN HARDLY CONTROL THE STANDARD MADS BUTTON
+				        Display display = wm.getDefaultDisplay();
+						int adHeight = display.getHeight();
+						int adWidth = display.getWidth();	
+						int buttonSize;
+						if(adWidth > adHeight) {
+							buttonSize = (adWidth / 25);
+						} else{
+							buttonSize = (adWidth / 10);
+						}
+						int buttonMargin = buttonSize / 10;
+						ImageButton closeButton = new ImageButton(mContext);
+						closeButton.setImageResource(R.drawable.ads_close_button);
+						closeButton.setScaleType(ScaleType.FIT_END);
+						closeButton.setPadding(0,0,0,0);
+						closeButton.setBackgroundColor(Color.TRANSPARENT);
+						closeButton.setId(234234432);
+						
+				        RelativeLayout.LayoutParams ButtonParams = new RelativeLayout.LayoutParams(buttonSize, buttonSize);
 
+				        
+				        ButtonParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+				        ButtonParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+				        ButtonParams.setMargins(buttonMargin, buttonMargin, buttonMargin, buttonMargin);
+				        
+				        closeButton.setLayoutParams(ButtonParams);
+
+				        if(closeButtonClosed == false && ad_view.getChildCount() > 0){
+				        	ad_view.addView(closeButton);
+				        }
+				        
+				        closeButton.bringToFront();
+				        closeButton.setOnClickListener(new OnClickListener() {
+				            public void onClick(View v) {
+				              Log.i("ThumbrSDK","Close the interstitial.");
+				              if(mListener!=null) {mListener.onEvent();}
+				              ad_view.removeAllViews();
+				            }
+				        });
+					}
+				}, (settings.getInt("showCloseButtonTime",6) * 1000));
+				
+
+				//after 8 second do more stuff
+				final Handler handler3 = new Handler();
+				handler3.postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						View closeButton = ((Activity) mContext).findViewById(234234432);
+						if(((Activity) mContext).findViewById(234234432) != null ){
+							closeButton.bringToFront();
+						}
+					}
+				}, 8000);
+				
+				
 			}
 
 			@Override
 			public void error(AdView sender, String error) {
 				Log.e("MRAID", "Error in ad download phase: " + error);
-
+				progress.dismiss();
+				if(mListener!=null) {mListener.onEvent();}
 			}
 
 			@Override
 			public void noad(AdView sender) {
 				Log.d("MRAID", "The ad server responded by telling us no ad is available");
-
+				progress.dismiss();
+				if(mListener!=null) {mListener.onEvent();}
 			}
 		});		
 
@@ -1540,7 +1723,7 @@ public class FunctionThumbrSDK {
 
 		SharedPreferences settings = mContext.getSharedPreferences("ThumbrSettings", Context.MODE_PRIVATE);
 
-		final MadsAdView adView = new MadsAdView(mContext, getAdSetting("overlay","secret"), getAdSetting("overlay","zoneid"));
+		MadsAdView adView = new MadsAdView(mContext, getAdSetting("overlay","secret"), getAdSetting("overlay","zoneid"));
 		adView.setAdserverURL("http://ads.thumbr.com/adserver/");
 		adView.setBackgroundColor(Color.TRANSPARENT);
 		adView.setId(1);
@@ -1549,7 +1732,7 @@ public class FunctionThumbrSDK {
 		adView.setLocationDetection(true);
 		adView.setMadsAdType("overlay");
 		adView.setUpdateTime(0);
-		adView.setShowCloseButtonTime(settings.getInt("showCloseButtonTime",6));
+		//adView.setShowCloseButtonTime(settings.getInt("showCloseButtonTime",6));
 
 		adView.setEnableExpandInActivity(true);
 		adView.setZip(settings.getString("zipcode",""));
@@ -1564,29 +1747,29 @@ public class FunctionThumbrSDK {
 		adView.setCountry(settings.getString("country",""));
 		Hashtable<String, Object> map = new Hashtable<String,Object>();
 		try{
-		map.put("id",URLEncoder.encode(settings.getString("id",""), "UTF-8"));	
-		map.put("sid",URLEncoder.encode(settings.getString("sid",""), "UTF-8"));
-		map.put("client_id",URLEncoder.encode(settings.getString("client_id",""), "UTF-8"));
-		map.put("handset_id",URLEncoder.encode(settings.getString("handset_id",""), "UTF-8"));
-		map.put("thumbr_id",URLEncoder.encode(settings.getString("thumbr_id",""), "UTF-8"));
-		map.put("profile_id",URLEncoder.encode(settings.getString("thumbr_id",""), "UTF-8"));		
-		map.put("address",URLEncoder.encode(settings.getString("address",""), "UTF-8"));
-		map.put("city",URLEncoder.encode(settings.getString("city",""), "UTF-8"));
-		map.put("country",URLEncoder.encode(settings.getString("country",""), "UTF-8"));
-		map.put("email",URLEncoder.encode(settings.getString("email",""), "UTF-8"));
-		map.put("firstname",URLEncoder.encode(settings.getString("firstname",""), "UTF-8"));
-		map.put("locale",URLEncoder.encode(settings.getString("locale",""), "UTF-8"));
-		map.put("msisdn",URLEncoder.encode(settings.getString("msisdn",""), "UTF-8"));
-		map.put("newsletter",URLEncoder.encode(settings.getString("newsletter",""), "UTF-8"));
-		map.put("status",URLEncoder.encode(settings.getString("status",""), "UTF-8"));
-		map.put("surname",URLEncoder.encode(settings.getString("surname",""), "UTF-8"));
-		map.put("username",URLEncoder.encode(settings.getString("username",""), "UTF-8"));
-		map.put("zipcode",URLEncoder.encode(settings.getString("zipcode",""), "UTF-8"));
-		map.put("gender",URLEncoder.encode(settings.getString("gender",""), "UTF-8"));
-		map.put("age",URLEncoder.encode(settings.getString("age",""), "UTF-8"));
-		map.put("date_of_birth",URLEncoder.encode(settings.getString("date_of_birth",""), "UTF-8"));
-		map.put("housenr",URLEncoder.encode(settings.getString("housenr",""), "UTF-8"));
-		map.put("token",URLEncoder.encode(settings.getString("token",""), "UTF-8"));
+			map.put("id",URLEncoder.encode(settings.getString("id",""), "UTF-8"));	
+			map.put("sid",URLEncoder.encode(settings.getString("sid",""), "UTF-8"));
+			map.put("client_id",URLEncoder.encode(settings.getString("client_id",""), "UTF-8"));
+			map.put("handset_id",URLEncoder.encode(settings.getString("handset_id",""), "UTF-8"));
+			map.put("thumbr_id",URLEncoder.encode(settings.getString("thumbr_id",""), "UTF-8"));
+			map.put("profile_id",URLEncoder.encode(settings.getString("thumbr_id",""), "UTF-8"));		
+			map.put("address",URLEncoder.encode(settings.getString("address",""), "UTF-8"));
+			map.put("city",URLEncoder.encode(settings.getString("city",""), "UTF-8"));
+			map.put("country",URLEncoder.encode(settings.getString("country",""), "UTF-8"));
+			map.put("email",URLEncoder.encode(settings.getString("email",""), "UTF-8"));
+			map.put("firstname",URLEncoder.encode(settings.getString("firstname",""), "UTF-8"));
+			map.put("locale",URLEncoder.encode(settings.getString("locale",""), "UTF-8"));
+			map.put("msisdn",URLEncoder.encode(settings.getString("msisdn",""), "UTF-8"));
+			map.put("newsletter",URLEncoder.encode(settings.getString("newsletter",""), "UTF-8"));
+			map.put("status",URLEncoder.encode(settings.getString("status",""), "UTF-8"));
+			map.put("surname",URLEncoder.encode(settings.getString("surname",""), "UTF-8"));
+			map.put("username",URLEncoder.encode(settings.getString("username",""), "UTF-8"));
+			map.put("zipcode",URLEncoder.encode(settings.getString("zipcode",""), "UTF-8"));
+			map.put("gender",URLEncoder.encode(settings.getString("gender",""), "UTF-8"));
+			map.put("age",URLEncoder.encode(settings.getString("age",""), "UTF-8"));
+			map.put("date_of_birth",URLEncoder.encode(settings.getString("date_of_birth",""), "UTF-8"));
+			map.put("housenr",URLEncoder.encode(settings.getString("housenr",""), "UTF-8"));
+			map.put("token",URLEncoder.encode(settings.getString("token",""), "UTF-8"));
 		}catch (UnsupportedEncodingException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -1615,6 +1798,7 @@ public class FunctionThumbrSDK {
 			}
 			@Override
 			public void onClose() {
+				@SuppressWarnings("unused")
 				Runnable mMyRunnable = new Runnable()
 				{
 					@Override
@@ -1659,41 +1843,38 @@ public class FunctionThumbrSDK {
 	}
 
 	public String getHash(String key,String id) throws NoSuchAlgorithmException, UnsupportedEncodingException{
-		
-		try{
-		MessageDigest md = MessageDigest.getInstance("SHA-256");
-		String text = key + ":" + id;
-		md.update(text.getBytes("UTF-8")); // Change this to "UTF-16" if needed
-		byte[] result = md.digest();
-		StringBuilder sb = new StringBuilder();
 
-		for (byte b : result) // This is your byte[] result..
-		{
-		    sb.append(String.format("%02x", b));
-		}
-		
-		return sb.toString();
-		
+		try{
+			MessageDigest md = MessageDigest.getInstance("SHA-256");
+			String text = key + ":" + id;
+			md.update(text.getBytes("UTF-8")); // Change this to "UTF-16" if needed
+			byte[] result = md.digest();
+			StringBuilder sb = new StringBuilder();
+
+			for (byte b : result) // This is your byte[] result..
+			{
+				sb.append(String.format("%02x", b));
+			}
+
+			return sb.toString();
+
 		} catch (Exception e) {
-	        e.printStackTrace(System.err);
-	        return null;
-	    }
+			e.printStackTrace(System.err);
+			return null;
+		}
 	}
-	
+
 	@TargetApi(Build.VERSION_CODES.BASE)
 	@SuppressLint("NewApi")
 	public void adInline(final RelativeLayout ad_view)
 	{
-
+		
 		ad_view.removeAllViews();		
 		SharedPreferences settings = mContext.getSharedPreferences("ThumbrSettings", Context.MODE_PRIVATE);
 
-		if(isOnline()){
-			getAdSettings();
-		}
-
-		final MadsAdView adView = new MadsAdView(mContext, getAdSetting("inline","secret"), getAdSetting("inline","zoneid"));
-		adView.setAdserverURL("https://m-dev.thumbr.com/adserver/");
+		MadsAdView adView = new MadsAdView(mContext, getAdSetting("inline","secret"), getAdSetting("inline","zoneid"));
+		
+		adView.setAdserverURL("http://ads.thumbr.com/adserver/");
 		adView.setBackgroundColor(Color.TRANSPARENT);
 		adView.setId(1);
 		adView.setInternalBrowser(true);
@@ -1706,7 +1887,7 @@ public class FunctionThumbrSDK {
 		}else{
 			adView.setUpdateTime(settings.getInt("updateTimeInterval",0));
 		}
-		adView.setShowCloseButtonTime(settings.getInt("showCloseButtonTime",6));
+		//adView.setShowCloseButtonTime(settings.getInt("showCloseButtonTime",6));
 		adView.setEnableExpandInActivity(true);
 
 		adView.setZip(settings.getString("zipcode",""));
@@ -1721,34 +1902,34 @@ public class FunctionThumbrSDK {
 		adView.setCountry(settings.getString("country",""));
 		Hashtable<String, Object> map = new Hashtable<String,Object>();
 		try{
-		map.put("id",URLEncoder.encode(settings.getString("id",""), "UTF-8"));	
-		map.put("sid",URLEncoder.encode(settings.getString("sid",""), "UTF-8"));
-		map.put("client_id",URLEncoder.encode(settings.getString("client_id",""), "UTF-8"));
-		map.put("handset_id",URLEncoder.encode(settings.getString("handset_id",""), "UTF-8"));
-		map.put("thumbr_id",URLEncoder.encode(settings.getString("thumbr_id",""), "UTF-8"));
-		map.put("profile_id",URLEncoder.encode(settings.getString("thumbr_id",""), "UTF-8"));		
-		map.put("address",URLEncoder.encode(settings.getString("address",""), "UTF-8"));
-		map.put("city",URLEncoder.encode(settings.getString("city",""), "UTF-8"));
-		map.put("country",URLEncoder.encode(settings.getString("country",""), "UTF-8"));
-		map.put("email",URLEncoder.encode(settings.getString("email",""), "UTF-8"));
-		map.put("firstname",URLEncoder.encode(settings.getString("firstname",""), "UTF-8"));
-		map.put("locale",URLEncoder.encode(settings.getString("locale",""), "UTF-8"));
-		map.put("msisdn",URLEncoder.encode(settings.getString("msisdn",""), "UTF-8"));
-		map.put("newsletter",URLEncoder.encode(settings.getString("newsletter",""), "UTF-8"));
-		map.put("status",URLEncoder.encode(settings.getString("status",""), "UTF-8"));
-		map.put("surname",URLEncoder.encode(settings.getString("surname",""), "UTF-8"));
-		map.put("username",URLEncoder.encode(settings.getString("username",""), "UTF-8"));
-		map.put("zipcode",URLEncoder.encode(settings.getString("zipcode",""), "UTF-8"));
-		map.put("gender",URLEncoder.encode(settings.getString("gender",""), "UTF-8"));
-		map.put("age",URLEncoder.encode(settings.getString("age",""), "UTF-8"));
-		map.put("date_of_birth",URLEncoder.encode(settings.getString("date_of_birth",""), "UTF-8"));
-		map.put("housenr",URLEncoder.encode(settings.getString("housenr",""), "UTF-8"));
-		map.put("token",URLEncoder.encode(settings.getString("token",""), "UTF-8"));
+			map.put("id",URLEncoder.encode(settings.getString("id",""), "UTF-8"));	
+			map.put("sid",URLEncoder.encode(settings.getString("sid",""), "UTF-8"));
+			map.put("client_id",URLEncoder.encode(settings.getString("client_id",""), "UTF-8"));
+			map.put("handset_id",URLEncoder.encode(settings.getString("handset_id",""), "UTF-8"));
+			map.put("thumbr_id",URLEncoder.encode(settings.getString("thumbr_id",""), "UTF-8"));
+			map.put("profile_id",URLEncoder.encode(settings.getString("thumbr_id",""), "UTF-8"));		
+			map.put("address",URLEncoder.encode(settings.getString("address",""), "UTF-8"));
+			map.put("city",URLEncoder.encode(settings.getString("city",""), "UTF-8"));
+			map.put("country",URLEncoder.encode(settings.getString("country",""), "UTF-8"));
+			map.put("email",URLEncoder.encode(settings.getString("email",""), "UTF-8"));
+			map.put("firstname",URLEncoder.encode(settings.getString("firstname",""), "UTF-8"));
+			map.put("locale",URLEncoder.encode(settings.getString("locale",""), "UTF-8"));
+			map.put("msisdn",URLEncoder.encode(settings.getString("msisdn",""), "UTF-8"));
+			map.put("newsletter",URLEncoder.encode(settings.getString("newsletter",""), "UTF-8"));
+			map.put("status",URLEncoder.encode(settings.getString("status",""), "UTF-8"));
+			map.put("surname",URLEncoder.encode(settings.getString("surname",""), "UTF-8"));
+			map.put("username",URLEncoder.encode(settings.getString("username",""), "UTF-8"));
+			map.put("zipcode",URLEncoder.encode(settings.getString("zipcode",""), "UTF-8"));
+			map.put("gender",URLEncoder.encode(settings.getString("gender",""), "UTF-8"));
+			map.put("age",URLEncoder.encode(settings.getString("age",""), "UTF-8"));
+			map.put("date_of_birth",URLEncoder.encode(settings.getString("date_of_birth",""), "UTF-8"));
+			map.put("housenr",URLEncoder.encode(settings.getString("housenr",""), "UTF-8"));
+			map.put("token",URLEncoder.encode(settings.getString("token",""), "UTF-8"));
 		}catch (UnsupportedEncodingException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		
+
 		try {
 			map.put("sig",getHash(theKey, settings.getString("thumbr_id", "")));
 		} catch (NoSuchAlgorithmException e) {
@@ -1758,7 +1939,7 @@ public class FunctionThumbrSDK {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		adView.setCustomParameters(map);
 
 		if(isOnline() && getAdSetting("inline","zoneid") != ""){
@@ -1766,7 +1947,7 @@ public class FunctionThumbrSDK {
 		}
 		else{
 			return;
-			}
+		}
 
 		RelativeLayout rl = new RelativeLayout(mContext);
 
@@ -1805,6 +1986,7 @@ public class FunctionThumbrSDK {
 			}
 			@Override
 			public void onClose() {
+				@SuppressWarnings("unused")
 				Runnable mMyRunnable = new Runnable()
 				{
 					@Override
@@ -1857,7 +2039,7 @@ public class FunctionThumbrSDK {
 
 				}
 			});			
-			
+
 		}
 		else
 		{
@@ -1994,6 +2176,62 @@ public class FunctionThumbrSDK {
 				}
 			});
 		}
+		if(isOnline()){
+			getAdSettings();
+		}
 	}
+	@Override
+	public void event(AdView arg0, String arg1, String arg2) {
+
+		// TODO Auto-generated method stub
+	}
+
+	public String closeListen(){
+		//MADS SDK does not properly listen to the mraid.close() function, so we're listening to it and closing and removing the adView ourselves.
+		Log.i("ThumbrSDK","closeListen was called");
+		try {((Activity) mContext).runOnUiThread(new Runnable() {
+
+			public void run() {
+				mListener.onEvent();
+				((ViewGroup) ad_view).removeAllViews();
+			}
+		});
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return "";
+	}
+
+	
+	public String hideNativeCloseButton(){/*for MADS adserver*/
+		Log.i("ThumbrSDK","hideNativeCloseButton was called");
+		try {
+			View closeButton = ((Activity) mContext).findViewById(234234432);
+			this.closeButtonClosed = true;
+			if(((Activity) mContext).findViewById(234234432) != null ){
+				closeButton.setVisibility(View.GONE);
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return "";
+	}
+
+	public String showNativeCloseButton(){/*for MADS adserver*/
+		Log.i("ThumbrSDK","showNativeCloseButton was called");
+		try {
+			
+			this.closeButtonClosed = false;
+			//closeButton.setVisibility(View.VISIBLE);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return "";
+	}	
+	
+	
 }
 

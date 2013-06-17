@@ -1,51 +1,34 @@
 package com.gkxim.android.thumbsdk.components;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Locale;
 import java.util.Map;
-import android.webkit.SslErrorHandler;
-import android.net.http.SslError;
-import com.gkxim.android.thumbsdk.FunctionThumbrSDK;
-import com.gkxim.android.thumbsdk.R;
-import com.gkxim.android.thumbsdk.utils.APIServer;
-import com.gkxim.android.thumbsdk.utils.ProfileObject;
-import com.gkxim.android.thumbsdk.utils.TBrLog;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.DialogInterface.OnDismissListener;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.net.http.SslError;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Config;
 import android.util.Log;
-import android.view.Display;
-import android.view.Gravity;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnLongClickListener;
-import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.view.WindowManager;
 import android.webkit.CookieManager;
-import android.webkit.CookieSyncManager;
+import android.webkit.JavascriptInterface;
+import android.webkit.SslErrorHandler;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -53,21 +36,21 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.PopupWindow;
-import android.widget.RelativeLayout.LayoutParams;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.RelativeLayout.LayoutParams;
 
+import com.gkxim.android.thumbsdk.FunctionThumbrSDK;
+import com.gkxim.android.thumbsdk.R;
+import com.gkxim.android.thumbsdk.utils.APIServer;
+import com.gkxim.android.thumbsdk.utils.ProfileObject;
+import com.gkxim.android.thumbsdk.utils.TBrLog;
+
+@SuppressLint("SetJavaScriptEnabled")
 public class ThumbrWebViewDialog extends Dialog implements
 android.view.View.OnClickListener {
 
 
 	private String url_hasdcode ="access_token=";
-	private final int CONNECTION_TIMEOUT = 30000;
-	private final int CLOSE_TIMEOUT = 2000;
-	private Drawable mAnimLoading = null;
 	private static final int CONST_BTN_CLOSE_ID = android.R.id.closeButton;
 	private static final int CONST_BTN_ABOUT_TITLE = android.R.id.button1;
 	private String mURL;
@@ -77,13 +60,11 @@ android.view.View.OnClickListener {
 	private View dialogTimeOut;
 	private Context mContext = null;
 	private int oldOrientation = ActivityInfo.SCREEN_ORIENTATION_USER;
-	private boolean mAnimationRun=false;	
 	private boolean isShowButtonClose=true;
 	boolean isRequested = false;
 	private RelativeLayout aView = null;
 	public boolean isNetwork = true;
 	private Dialog dialog = null;
-	private  popupLoading pLoading = null;
 	private boolean finished = false;
 	private AnimationDrawable anim;
 	private FrameLayout frameLayout = null;
@@ -183,8 +164,8 @@ android.view.View.OnClickListener {
 
 	public ThumbrWebViewDialog(Context context,Boolean showButtonClose) {
 		super(context, R.style.Transparent);
+		
 		isShowButtonClose=showButtonClose;
-		mAnimationRun=false;
 		mContext = context;
 		isNetwork = isNetworkAvailable();
 		dialogTimeOut = getLayoutInflater().inflate(R.layout.image_time_out,
@@ -192,6 +173,7 @@ android.view.View.OnClickListener {
 		//		TBrLog.l(TBrLog.TMB_LOGTYPE_INFO, "ThumbrWebViewDialog");
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
+		
 		mProcessingTitle = "Please wait...";
 		Context theContext = getContext();
 		aView = (RelativeLayout) getWebViewLayout(theContext, 0);
@@ -240,6 +222,12 @@ android.view.View.OnClickListener {
 						: "(NOT NULL)");
 
 		try {
+			SharedPreferences settings = mContext.getSharedPreferences("ThumbrSettings", Context.MODE_PRIVATE);
+			if(settings.getInt("hideThumbrCloseButton", 0) == 1){
+				View header = findViewById(R.id.include1);
+				header.setVisibility(View.GONE);
+			}
+			
 			if (mWebView == null) {
 				Context theContext = getContext();
 				aView = (RelativeLayout) getWebViewLayout(theContext, 0);
@@ -486,38 +474,6 @@ android.view.View.OnClickListener {
 	}
 
 
-	private void onCreatePopupLoading(){
-		Context theContext = getContext();
-		pLoading = new popupLoading(theContext);
-		pLoading.onShow();
-	}
-
-	private class popupLoading extends Dialog{
-		ImageView img = null;
-		public popupLoading(Context context) {
-			super(context);
-			// TODO Auto-generated constructor stub
-		}
-		@Override
-		protected void onCreate(Bundle savedInstanceState) {
-			// TODO Auto-generated method stub
-			super.onCreate(savedInstanceState);
-
-			requestWindowFeature(Window.FEATURE_NO_TITLE);
-
-		}
-		public void onShow(){
-			show();
-		}
-
-		@Override
-		public void onWindowFocusChanged(boolean hasFocus) {
-			// TODO Auto-generated method stub
-			super.onWindowFocusChanged(hasFocus);
-
-		}
-	}
-
 	private void onCreateAnimation(){
 
 
@@ -589,6 +545,7 @@ android.view.View.OnClickListener {
 
 
 	public class onWebViewClient extends WebViewClient {
+		@JavascriptInterface
 		@Override
 		public void onPageFinished(WebView view, String url) {
 			super.onPageFinished(view, url);
@@ -750,7 +707,9 @@ android.view.View.OnClickListener {
 
 			Log.i("ThumbrSDK","intercept url string: "+s);
 			Uri uri=Uri.parse(s);
-			accToken = uri.getQueryParameter("access_token");
+			if(uri.getQueryParameter("access_token") != null){
+				accToken = uri.getQueryParameter("access_token");
+			}
 			Log.i("ThumbrSDK","Access token: "+accToken);
 			return true;
 		}else{			
@@ -792,15 +751,15 @@ android.view.View.OnClickListener {
 	public boolean isLogined(){
 		if(getProfile()!=null && hasEmail()){
 			Log.i("ThumbrSDK","log in succeeded with acc token: "+get_AccToken());
-			mContext.getSharedPreferences(FunctionThumbrSDK.LOGINED,((Activity)mContext).MODE_PRIVATE).edit()
+			mContext.getSharedPreferences(FunctionThumbrSDK.LOGINED,Context.MODE_PRIVATE).edit()
 			.putBoolean(FunctionThumbrSDK.LOGINED,true).commit();
-			mContext.getSharedPreferences(FunctionThumbrSDK.ACCESSTOKEN,((Activity)mContext).MODE_PRIVATE).edit()
+			mContext.getSharedPreferences(FunctionThumbrSDK.ACCESSTOKEN,Context.MODE_PRIVATE).edit()
 			.putString(FunctionThumbrSDK.ACCESSTOKEN,get_AccToken()).commit();
 			return true;
 		}
-		mContext.getSharedPreferences(FunctionThumbrSDK.LOGINED,((Activity)mContext).MODE_PRIVATE).edit()
+		mContext.getSharedPreferences(FunctionThumbrSDK.LOGINED,Context.MODE_PRIVATE).edit()
 		.putBoolean(FunctionThumbrSDK.LOGINED,false).commit();
-		mContext.getSharedPreferences(FunctionThumbrSDK.ACCESSTOKEN,((Activity)mContext).MODE_PRIVATE).edit()
+		mContext.getSharedPreferences(FunctionThumbrSDK.ACCESSTOKEN,Context.MODE_PRIVATE).edit()
 		.putString(FunctionThumbrSDK.ACCESSTOKEN,get_AccToken()).commit();
 		return false;
 	}

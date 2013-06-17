@@ -6,6 +6,12 @@ Revision history
 ----------------
 <table>
 	<tr>
+		<td>2.0.32</td>
+		<td>
+		-Improved interstitial advertisements<br />
+		</td>
+	</tr>
+	<tr>
 		<td>2.0.31</td>
 		<td>
 		-Personalized Ad serving support<br />
@@ -166,7 +172,12 @@ Register button (bt_re) (within linear layout)
 
 Switch User button (bt_switch) :: OPTIONAL :: THIS BUTTON IS USED TO LET THE USER SWITCH TO ANOTHER USER ACCOUNT
 
-	<Button android:id="@+id/bt_switch" style="?android:attr/buttonStyleSmall" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="bottom|left" android:text="Switch User" />
+	<Button android:id="@+id/bt_switch" 
+	style="?android:attr/buttonStyleSmall" 
+	android:layout_width="wrap_content" 
+	android:layout_height="wrap_content" 
+	android:layout_gravity="bottom|left" 
+	android:text="Switch User" />
 	
 If you are using Advertisements add these ad_views to your layout (s)
 
@@ -360,14 +371,17 @@ THE AD SERVING SETTINGS NEED TO BE REPLACED. THE SETTINGS BELOW ARE DEMO SETTING
 		     
 		     -default (the default behaviour)
 		     -registration (forced registration form)
-		     -optional_registration (registration is optional. A counter will determine when the registration will be shown again)
+		     -optional_registration (registration is optional. 
+		     A counter will determine when the registration will be shown again)
 		     
 		     */
 			thumbr.setAction(action);
 			
-			//(OPTIONAL) AUTOMATICALLY START THE THUMBR SDK WHEN OPENING THE APPLICATION. ONLY THE FIRST TIME, IN THIS EXAMPLE
+			//(OPTIONAL) AUTOMATICALLY START THE THUMBR SDK WHEN OPENING THE APPLICATION. 
+			ONLY THE FIRST TIME, IN THIS EXAMPLE
 			if(thumbr.getCount() < 2){
-				thumbr.setLinkRegister(registerUrl+"response_type=token&country="+country+"&locale="+locale+"&sid="+sid+"&client_id="+client_id+"&handset_id="+appsFlyerId);
+				thumbr.setLinkRegister(registerUrl+"response_type=token&country="+country+"&locale=" 
+				+locale +"&sid="+sid+"&client_id="+client_id+"&handset_id="+appsFlyerId);
 				
 			thumbr.adInit();//initialize Ads if you are showing Thumbr Ads
 
@@ -382,7 +396,9 @@ THE AD SERVING SETTINGS NEED TO BE REPLACED. THE SETTINGS BELOW ARE DEMO SETTING
 		//LOAD AND ANIMATE THE THUMBR LOGO :: RESIZE IT TO A PERCENTAGE OF THE SCREEN WIDTH
 		@Override
 		public void onWindowFocusChanged(boolean hasFocus) {
-		ImageButton thumbrLogo = (ImageButton) findViewById(com.gkxim.tqhung.thumbr.R.id.bt_re);//CHANGE THIS PATH TO THE THUMBR BUTTON IN YOUR LAYOUT
+		//CHANGE THIS PATH TO THE THUMBR BUTTON IN YOUR LAYOUT
+		ImageButton thumbrLogo = (ImageButton) findViewById(com.gkxim.tqhung.thumbr.R.id.bt_re);
+		
 		
 		Display display = getWindowManager().getDefaultDisplay();
 		Point size = new Point();
@@ -402,14 +418,24 @@ THE AD SERVING SETTINGS NEED TO BE REPLACED. THE SETTINGS BELOW ARE DEMO SETTING
 		//CATCH BUTTON CLICKS
 		@Override
 		public void onClick(View v) {	
-			if(v.getId()==com.yourcompany.yourapp.R.id.bt_re){//CHANGE THIS PATH TO THE THUMBR BUTTON IN YOUR LAYOUT!!
-				thumbr.setLinkRegister(registerUrl+"response_type=token&country="+country+"&locale="+locale+"&sid="+sid+"&client_id="+client_id+"&handset_id="+appsFlyerId);			
+			if(v.getId()==com.yourcompany.yourapp.R.id.bt_re){
+			//CHANGE THIS PATH TO THE THUMBR BUTTON IN YOUR LAYOUT!!
+				thumbr.setLinkRegister(registerUrl+"response_type=token&country="+country+"&locale=" 
+				+locale+"&sid="+sid+"&client_id="+client_id+"&handset_id="+appsFlyerId);			
 				thumbr.buttonREGISTER();
 			}	
-			if(v.getId()==com.yourcompany.yourapp.R.id.bt_switch){//CHANGE THIS PATH TO THE SWITCH BUTTON IN YOUR LAYOUT!!
-				thumbr.setOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);//OPTIONALLY CHANGE THE THUMBR SDK ORIENTATION WHEN USER SWITCHES (WAR2GLORY NEEDS THIS SETTING!!!)
-				thumbr.setEnableButtonClose(true);//OPTIONALLY SHOW THE CLOSE BUTTON :: SWITCH VIEW DOES NOT HAVE "PLAY-NOW" BUTTON"
-				thumbr.setLinkSwitch(registerUrl+"response_type=token&step=switchaccount&country="+country+"&locale="+locale+"&sid="+sid+"&client_id="+client_id+"&handset_id="+appsFlyerId);			
+			if(v.getId()==com.yourcompany.yourapp.R.id.bt_switch){
+			//CHANGE THIS PATH TO THE SWITCH BUTTON IN YOUR LAYOUT!!
+			
+			thumbr.setOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+			//OPTIONALLY CHANGE THE THUMBR SDK ORIENTATION WHEN USER SWITCHES (WAR2GLORY NEEDS THIS SETTING!!!)
+			
+			thumbr.setEnableButtonClose(true);
+			//OPTIONALLY SHOW THE CLOSE BUTTON :: SWITCH VIEW DOES NOT HAVE "PLAY-NOW" BUTTON"
+				
+			
+			thumbr.setLinkSwitch(registerUrl+"response_type=token&step=switchaccount&country="+country+"&locale="
+			+locale+"&sid="+sid+"&client_id="+client_id+"&handset_id="+appsFlyerId);			
 				thumbr.buttonSWITCH();
 			}			
 		}	
@@ -427,7 +453,8 @@ THE AD SERVING SETTINGS NEED TO BE REPLACED. THE SETTINGS BELOW ARE DEMO SETTING
 			//CALL THE EXAMPLE USER DATA FUNCTION
 			getUserData();
 
-			//AFTER FIRST OPEN, LET THE SDK KNOW REGISTRATION IS OPTIONAL FROM NOW ON. REGISTRATION FLOW WILL STILL BE SHOWN EVERY #N TIMES (#N = DETERMINED SERVER SIDE)
+			//AFTER FIRST OPEN, LET THE SDK KNOW REGISTRATION IS OPTIONAL FROM NOW ON. 
+			//REGISTRATION FLOW WILL STILL BE SHOWN EVERY #N TIMES (#N = DETERMINED SERVER SIDE)
 			thumbr.setAction("optional_registration");
 		}	
 
@@ -439,7 +466,8 @@ THE AD SERVING SETTINGS NEED TO BE REPLACED. THE SETTINGS BELOW ARE DEMO SETTING
 			if(ojb!=null){
 				
 				if(ojb.getmEmail() != "null"){
-					//OPTIONALLY CHANGE THE THUMBR SDK ORIENTATION AFTER USER HAS SUBSCRIBED (WAR2GLORY NEEDS THIS SETTING!!!)
+					//OPTIONALLY CHANGE THE THUMBR SDK ORIENTATION AFTER USER HAS SUBSCRIBED 
+					//(WAR2GLORY NEEDS THIS SETTING!!!)
 					thumbr.setOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 				}
 				
