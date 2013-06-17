@@ -9,6 +9,7 @@ Revision history
 		<td>2.0.32</td>
 		<td>
 		-Improved interstitial advertisements<br />
+		-Added ad serving-only demo
 		</td>
 	</tr>
 	<tr>
