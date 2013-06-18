@@ -8,8 +8,9 @@ Revision history
 	<tr>
 		<td>2.0.32</td>
 		<td>
-		-Improved interstitial advertisements<br />
-		-Added ad serving-only demo
+		-Possibility to hide the Thumbr close button (remote configuration)<br />
+		-Improved interstitial ads<br />
+		-Added demo and manual for Ad-only integration
 		</td>
 	</tr>
 	<tr>
