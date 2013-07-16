@@ -93,7 +93,7 @@ import com.gkxim.android.thumbsdk.utils.WSStateCode;
 import com.gkxim.android.thumbsdk.utils.WSSwitchListener;
 import com.nineoldandroids.*;
 import com.unity3d.player.UnityPlayer;
-
+import com.gkxim.android.thumbsdk.utils.EVA;
 
 
 @TargetApi(Build.VERSION_CODES.BASE)

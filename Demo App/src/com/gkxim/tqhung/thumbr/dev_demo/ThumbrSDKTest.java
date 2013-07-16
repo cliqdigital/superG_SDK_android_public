@@ -26,6 +26,7 @@ import com.appsflyer.AppsFlyerLib;
 import com.gkxim.android.thumbsdk.FunctionThumbrSDK;
 import com.gkxim.android.thumbsdk.FunctionThumbrSDK.OnInterstitialCloseListener;
 import com.gkxim.android.thumbsdk.utils.ProfileObject;
+import com.gkxim.android.thumbsdk.utils.EVA;
 
 @SuppressLint("ShowToast")
 public class ThumbrSDKTest extends Activity implements OnClickListener,OnDismissListener{
@@ -37,7 +38,7 @@ public class ThumbrSDKTest extends Activity implements OnClickListener,OnDismiss
 	//APP SPECIFIC SETTINGS
 	private String sid = "com.thumbr.dragonsvsunicorns";
 	private String client_id = "84758475-476574";
-
+	
 
 	//DEFAULT GAME ORIENTATION (USED IN onDismiss() BELOW, TO SWITCH BACK AFTER SDK CLOSE)
 	private int gameOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
@@ -159,6 +160,9 @@ public class ThumbrSDKTest extends Activity implements OnClickListener,OnDismiss
 		thumbr.setLinkRegister(registerUrl+"response_type=token&country="+country+"&locale="+locale+"&sid="+sid+"&client_id="+client_id+"&handset_id="+appsFlyerId);			
 		thumbr.adInit();//initialize Ads if you are showing Thumbr Ads
 
+		EVA eva = new EVA();
+		eva.installation();
+		
 		if( FunctionThumbrSDK.isTabletDevice(this) == true) {
 			//this is a tablet
 			gameOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
