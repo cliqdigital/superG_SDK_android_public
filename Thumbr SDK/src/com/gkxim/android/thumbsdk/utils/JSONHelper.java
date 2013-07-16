@@ -1,6 +1,7 @@
 package com.gkxim.android.thumbsdk.utils;
 
 import android.annotation.SuppressLint;
+import android.os.StrictMode;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -14,7 +15,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-
+import com.nineoldandroids.*;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -90,7 +91,7 @@ public class JSONHelper {
 		JSONObject producedObject = null;
 		
 		initURL(url);
-		
+
 		try {
 			connect();
 		} catch (Exception e1) {
@@ -131,7 +132,9 @@ public class JSONHelper {
 	private boolean connect() {
 		boolean ret = true;
 		try {
-
+			StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+			StrictMode.setThreadPolicy(policy);
+			
 			if (myURL.getProtocol().toLowerCase().equals("https")) {
 			    trustAllHosts();
 				HttpsURLConnection https = (HttpsURLConnection) myURL.openConnection();
@@ -141,7 +144,7 @@ public class JSONHelper {
 				uc = (HttpURLConnection) myURL.openConnection();
 			}
 			
-			uc.connect();Log.i("ThumbrSDK","url= "+myURL);
+			uc.connect();
 			in = uc.getInputStream();
 		} catch (IOException e) {
 			e.printStackTrace();

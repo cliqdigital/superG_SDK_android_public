@@ -2,30 +2,30 @@ package com.gkxim.android.thumbsdk.utils;
 
 public class ProfileObject {
 	//info not valid
-	private String mMessage="";
-	private String mCode="";
-	private String mDesscription="";
-	private String mHttpCode="";
+	public String mMessage="";
+	public String mCode="";
+	public String mDesscription="";
+	public String mHttpCode="";
 	
 	//info if valid
-	private String mID="";
-	private String mUserName="";
-	private String mStatus="";
-	private String mEmail="";
-	private String mSurname="";
-	private String mGender="";
-	private String mAge="";	
-	private String mDOB="";
-	private String mLocale="";
-	private String mCity="";
-	private String mIncome="";	
-	private String mCountry="";	
-	private String mAddress="";
-	private String mZipCode="";
-	private String mNewsLetter="";
-	private String mFirstName="";
-	private String mSisdn="";
-	private String mHousenr="";
+	public String mID="";
+	public String mUserName="";
+	public String mStatus="";
+	public String mEmail="";
+	public String mSurname="";
+	public String mGender="";
+	public String mAge="";	
+	public String mDOB="";
+	public String mLocale="";
+	public String mCity="";
+	public String mIncome="";	
+	public String mCountry="";	
+	public String mAddress="";
+	public String mZipCode="";
+	public String mNewsLetter="";
+	public String mFirstName="";
+	public String mSisdn="";
+	public String mHousenr="";
 	 
 	
 	ProfileObject(){

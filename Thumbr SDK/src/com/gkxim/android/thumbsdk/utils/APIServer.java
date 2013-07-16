@@ -4,6 +4,7 @@ import org.json.JSONObject;
 
 import android.app.Activity;
 import android.content.Context;
+import android.util.Log;
 
 public class APIServer {
 	public static final String CLIENT_ID = "&client_id=";
@@ -25,17 +26,19 @@ public class APIServer {
 	}
 
 	public ProfileObject getProfile(String accToken) {
+
 		// get json
 		try {
 
 			ProfileObject prof = new ProfileObject();
 			String url = profileURL + accToken;
+			Log.i("getProfile URL:",url);			
 			JSONHelper parser = new JSONHelper();
 			
 			JSONObject jo = parser.getJSONObject(url);
 			
-			if (jo != null) {
-				if (jo.has("id")) {
+			if (jo != null) {Log.i("PROFILE","we have one");
+				if (jo.has("id")) {Log.i("PROFILE","we even have a user id");
 					prof.setmID(jo.getString("id"));
 				}
 				if (jo.has("username")) {

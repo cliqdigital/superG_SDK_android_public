@@ -35,7 +35,7 @@ public class ThumbrSDKTest extends Activity implements OnClickListener,OnDismiss
 	 */
 
 	//APP SPECIFIC SETTINGS
-	private String sid = "";
+	private String sid = "com.thumbr.dragonsvsunicorns";
 	private String client_id = "84758475-476574";
 
 
@@ -77,6 +77,7 @@ public class ThumbrSDKTest extends Activity implements OnClickListener,OnDismiss
 	private int hideThumbrCloseButton = 0;//hide the close button from the Thumbr Window? 1 or 0
 	private String SDKLayout = 		"thumbr";
 
+	
 	///LEAVE THESE VALUES EMPTY, UNLESS YOU KNOW WHAT YOU'RE DOING
 	private String country = 		"";//eg: DE or NL
 	private String locale = 		"";//eg: nl_NL or de_DE

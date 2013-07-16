@@ -1,14 +1,10 @@
 package com.gkxim.android.thumbsdk.utils;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.UUID;
 
 import android.app.Activity;
 import android.content.Context;
-import android.os.Environment;
 import android.provider.Settings.Secure;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -62,23 +58,23 @@ public class TBrLog {
 				break;
 			}
 			if (mLogFile == null) {
-				try {
-					mPathFile = Environment
-							.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-							+ "/" + GKIM_LOGFILE;
-					Log.i(LOG_TAG, "Writing log into: " + mPathFile);
-					mLogFile = new File(mPathFile);
-					if (mLogFile != null) {
-						BufferedWriter bw = new BufferedWriter(new FileWriter(
-								mLogFile, true));
-						if (bw != null) {
-							bw.write(message);
-						}
-						bw.close();
-					}
-				} catch (IOException e) {
-					// TODO: Silent
-				}
+//				try {
+//					mPathFile = Environment
+//							.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+//							+ "/" + GKIM_LOGFILE;
+//					Log.i(LOG_TAG, "Writing log into: " + mPathFile);
+//					mLogFile = new File(mPathFile);
+//					if (mLogFile != null) {
+//						BufferedWriter bw = new BufferedWriter(new FileWriter(
+//								mLogFile, true));
+//						if (bw != null) {
+//							bw.write(message);
+//						}
+//						bw.close();
+//					}
+//				} catch (IOException e) {
+//					// TODO: Silent
+//				}
 			}
 		}
 

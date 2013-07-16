@@ -79,7 +79,9 @@ import com.MadsAdView.MadsAdView;
 import com.adgoji.mraid.adview.AdView;
 import com.adgoji.mraid.adview.AdViewCore;
 import com.adgoji.mraid.adview.AdViewCore.MadsOnOrmmaListener;
+import com.adgoji.mraid.interfaces.AdViewCoreInterface;
 import com.adgoji.mraid.jsbridge.listeners.AdExpandListener;
+
 import com.appsflyer.AppsFlyerLib;
 import com.gkxim.android.thumbsdk.components.ThumbrWebViewDialog;
 import com.gkxim.android.thumbsdk.utils.APIServer;
@@ -89,8 +91,8 @@ import com.gkxim.android.thumbsdk.utils.WSLoginListener;
 import com.gkxim.android.thumbsdk.utils.WSRegisterListener;
 import com.gkxim.android.thumbsdk.utils.WSStateCode;
 import com.gkxim.android.thumbsdk.utils.WSSwitchListener;
-
-
+import com.nineoldandroids.*;
+import com.unity3d.player.UnityPlayer;
 
 
 
@@ -98,9 +100,9 @@ import com.gkxim.android.thumbsdk.utils.WSSwitchListener;
 @SuppressLint({ "NewApi", "SetJavaScriptEnabled" })
 public class FunctionThumbrSDK implements OnCancelListener,MadsOnOrmmaListener{
 
-	private static Context mContext;
-	private WSSwitchListener switchListener=null;
-	private ThumbrWebViewDialog mDialog;
+	public static Context mContext;
+	public WSSwitchListener switchListener=null;
+	public ThumbrWebViewDialog mDialog;
 	public static final String VALID_LOGINED = "Valid";
 	public static final String LOGINED = "Logined";
 	public static final String ACCESSTOKEN = "";
@@ -108,21 +110,21 @@ public class FunctionThumbrSDK implements OnCancelListener,MadsOnOrmmaListener{
 	public static final int Density_TV = 213;
 	public static final int Density_XHIGH = 320;
 	public static final int SIZE_XLARGE = 4;
-	private String mThumbrId, mGameId;
-	private boolean isShowbutonClose = true;
-	private boolean isConfigchange_orientation = false;
+	public String mThumbrId, mGameId;
+	public boolean isShowbutonClose = true;
+	public boolean isConfigchange_orientation = false;
 
 	public static final int MY_ORIENTATION = 0x0080;
-	private String linkRegister = "";
-	private String linkSwitch = "";
-	private String linkPortal = "";
-	private String theKey = "49b26e3ac8701cf4c5840587d1d5e6eba01ab329b9179f6aef925f362a98065f";
+	public String linkRegister = "";
+	public String linkSwitch = "";
+	public String linkPortal = "";
+	public String theKey = "49b26e3ac8701cf4c5840587d1d5e6eba01ab329b9179f6aef925f362a98065f";
 
-	private OnScoreSavedListener onScoreSavedListener;
-	private String SDKLayout;
+	public OnScoreSavedListener onScoreSavedListener;
+	public String SDKLayout;
 	protected MadsAdView adView;
 	public OnInterstitialCloseListener mListener;
-	private Object ad_view;
+	public Object ad_view;
 
 	public interface OnScoreSavedListener {
 		public void onScoreSaved(List<NameValuePair> returnlist);
@@ -135,7 +137,7 @@ public class FunctionThumbrSDK implements OnCancelListener,MadsOnOrmmaListener{
 	}
 
 
-	private TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager()
+	public TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager()
 	{
 		public java.security.cert.X509Certificate[] getAcceptedIssuers()
 		{
@@ -153,7 +155,7 @@ public class FunctionThumbrSDK implements OnCancelListener,MadsOnOrmmaListener{
 		}
 	}
 	};
-	private boolean closeButtonClosed;
+	public boolean closeButtonClosed;
 	/**
 	 * 
 	 * @param context
@@ -187,7 +189,7 @@ public class FunctionThumbrSDK implements OnCancelListener,MadsOnOrmmaListener{
 		intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
 		context.registerReceiver(new NetworkState(), intentFilter);
 		//initScores();
-		
+
 		if(isOnline()){
 			getAdSettings();
 		}
@@ -272,7 +274,7 @@ public class FunctionThumbrSDK implements OnCancelListener,MadsOnOrmmaListener{
 	}	
 
 
-	private void ThumbrClearCookies() {
+	public void ThumbrClearCookies() {
 
 		mDialog = new ThumbrWebViewDialog(mContext, isShowbutonClose);
 
@@ -301,27 +303,28 @@ public class FunctionThumbrSDK implements OnCancelListener,MadsOnOrmmaListener{
 		}
 	}
 
-	private void ShowDialog(String link) {
+	public void ShowDialog(String link) {
 		//SET THE REQUESTED ORIENTATION
 		//((Activity) mContext).setRequestedOrientation(requestedOrientation);
-		
+
 		//attach action to link
 		link = link + "&action=" + this.getAction() + "&sdk=1&count=" + getCount();
 
 		mContext.getSharedPreferences("ThumbrSettings", Context.MODE_PRIVATE).edit().putString("SDKLayout", getLayout()).commit();
-
 		mDialog = new ThumbrWebViewDialog(mContext, isShowbutonClose);
-		mDialog.setOnDismissListener((OnDismissListener) mContext);
+		try {
+			mDialog.setOnDismissListener((OnDismissListener) mContext);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		mDialog.setURL(link);// mContext.getResources().getString(R.string.Loginlink));
 		mDialog.show();
-
-
 
 	}
 
 
 
-	private void check_importConfichange() {
+	public void check_importConfichange() {
 		try {
 			int index = 1;
 			int lastindex = 0;
@@ -469,8 +472,8 @@ public class FunctionThumbrSDK implements OnCancelListener,MadsOnOrmmaListener{
 		return false;
 	}
 
-	
-	
+
+
 	public boolean isLogined() {
 		boolean flag = mContext.getSharedPreferences(FunctionThumbrSDK.LOGINED,
 				Context.MODE_PRIVATE).getBoolean(LOGINED, false);
@@ -563,7 +566,7 @@ public class FunctionThumbrSDK implements OnCancelListener,MadsOnOrmmaListener{
 
 	//SCORE METHODS
 
-	private void send (Map<String, String> params, String method) {
+	public void send (Map<String, String> params, String method) {
 		SharedPreferences gamesettings = mContext.getSharedPreferences("ThumbrScoreSettings", Context.MODE_PRIVATE);        
 
 		//LOCAL STORAGE
@@ -722,7 +725,7 @@ public class FunctionThumbrSDK implements OnCancelListener,MadsOnOrmmaListener{
 	}
 
 	//Store score calls that cannot be delivered
-	private void storeForLater(Map<String, String> params, String method, Long timestamp){
+	public void storeForLater(Map<String, String> params, String method, Long timestamp){
 		if(params != null){    	
 			SharedPreferences prefs = mContext.getSharedPreferences("storedGameActions", Context.MODE_PRIVATE);
 			String theJson="{\"method\":\""+method.toString()+"\",";
@@ -1317,13 +1320,13 @@ public class FunctionThumbrSDK implements OnCancelListener,MadsOnOrmmaListener{
 		return ReturnString.toString();
 	}
 
-	private int rand(){
+	public int rand(){
 		Random r = new Random();
 		int i1=r.nextInt();
 		return i1;
 	}
 
-	private String md5(String s) {
+	public String md5(String s) {
 		try {
 			// Create MD5 Hash
 			MessageDigest digest = java.security.MessageDigest.getInstance("MD5");
@@ -1398,23 +1401,23 @@ public class FunctionThumbrSDK implements OnCancelListener,MadsOnOrmmaListener{
 					line = reader.readLine();
 					String[] RowData = line.split(",");
 					if(RowData[0] != null){
-					settings.edit().putInt("updateTimeIntervalOverride", Integer.parseInt(RowData[0])).commit();
+						settings.edit().putInt("updateTimeIntervalOverride", Integer.parseInt(RowData[0])).commit();
 					}
 
 					if(RowData[1] != null){
-					settings.edit().putInt("showCloseButtonTime", Integer.parseInt(RowData[1])).commit();
+						settings.edit().putInt("showCloseButtonTime", Integer.parseInt(RowData[1])).commit();
 					}
 					else{
 						settings.edit().putInt("showCloseButtonTime", settings.getInt("showCloseButtonTime",6)).commit();	
 					}
-					
+
 					if(RowData[2] != null){
-					settings.edit().putInt("hideThumbrCloseButton", Integer.parseInt(RowData[2])).commit();
+						settings.edit().putInt("hideThumbrCloseButton", Integer.parseInt(RowData[2])).commit();
 					}
 					else{
 						settings.edit().putInt("hideThumbrCloseButton", settings.getInt("hideThumbrCloseButton", 0)).commit();	
 					}
-					
+
 					Log.i("ThumbrSDK","INLINE ADS UPDATE TIME INTERVAL: "+RowData[0]);
 					Log.i("ThumbrSDK","INTERSTITIAL ADS SHOW CLOSE BUTTON AFER N SECONDS: "+RowData[1]);
 					Log.i("ThumbrSDK","HIDE THUMBR WINDOW CLOSEBUTTON: "+RowData[2]);
@@ -1423,7 +1426,7 @@ public class FunctionThumbrSDK implements OnCancelListener,MadsOnOrmmaListener{
 					// handle exception
 					Log.i("ThumbrSDK","Cannot read settings");
 				}
-	            
+
 
 			} catch (UnsupportedEncodingException e) {
 				e.printStackTrace();
@@ -1480,8 +1483,8 @@ public class FunctionThumbrSDK implements OnCancelListener,MadsOnOrmmaListener{
 
 		((ViewGroup) this.ad_view).removeAllViews();
 	}
-	
-	
+
+
 	@SuppressLint("SetJavaScriptEnabled")
 	@JavascriptInterface
 	public void adInterstitial(final RelativeLayout ad_view){
@@ -1505,12 +1508,12 @@ public class FunctionThumbrSDK implements OnCancelListener,MadsOnOrmmaListener{
 		Display display = wm.getDefaultDisplay();
 
 
-		int adHeight = display.getHeight();
-		int adWidth = display.getWidth();
-		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) ad_view.getLayoutParams();
-		params.height = adHeight;
-		params.width = adWidth;
-		ad_view.setLayoutParams(params);
+		//		int adHeight = display.getHeight();
+		//		int adWidth = display.getWidth();
+		//		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) ad_view.getLayoutParams();
+		//		params.height = adHeight;
+		//		params.width = adWidth;
+		//		ad_view.setLayoutParams(params);
 
 		final SharedPreferences settings = mContext.getSharedPreferences("ThumbrSettings", Context.MODE_PRIVATE);
 
@@ -1518,8 +1521,6 @@ public class FunctionThumbrSDK implements OnCancelListener,MadsOnOrmmaListener{
 		WebSettings aWS = adView.getSettings();
 		aWS.setJavaScriptCanOpenWindowsAutomatically(true);
 		aWS.setJavaScriptEnabled(true);
-		
-
 
 		adView.addJavascriptInterface(this, "CUSTOMANDROID");		
 
@@ -1605,7 +1606,12 @@ public class FunctionThumbrSDK implements OnCancelListener,MadsOnOrmmaListener{
 				RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) ad_view.getLayoutParams();
 				params.height = 0;
 				ad_view.setLayoutParams(params);
-				if(mListener!=null) {mListener.onEvent();}
+				if(mListener!=null) {mListener.onEvent();
+
+				}
+				if(UnityPlayer.currentActivity != null ){
+					UnityPlugin.interstitialClosed();
+				}
 			}
 		});
 
@@ -1620,8 +1626,9 @@ public class FunctionThumbrSDK implements OnCancelListener,MadsOnOrmmaListener{
 			@Override
 			public void end(final AdView sender) 
 			{		
+				adView.loadUrl("javascript:(function() {" + "var s = document.createElement(\"script\");s.type = \"text/javascript\";s.src = \"http://ads.thumbr.com/adserver/js/OrmmaAdController.js\";document.getElementsByTagName('body') [0].appendChild(s)" +  "})()");
 				adView.loadUrl("javascript:(function() {" + "if (typeof mraid !== 'undefined') {var oldVersion = mraid.close;mraid.close = function() {var result = oldVersion.apply(this, arguments);CUSTOMANDROID.closeListen(); return result;}};" +  "})()");
-				
+
 				//after 1 second do stuff
 				final Handler handler = new Handler();
 				handler.postDelayed(new Runnable() {
@@ -1632,19 +1639,19 @@ public class FunctionThumbrSDK implements OnCancelListener,MadsOnOrmmaListener{
 						ad_view.setBackgroundColor(Color.parseColor("#AA000000"));
 					}
 				}, 1000);
-				
+
 				//after x seconds, show the close button (if not cancelled by mraid CustomButton)
 				final Handler handler2 = new Handler();
 				handler2.postDelayed(new Runnable() {
 					@Override
 					public void run() {
 						adView.loadUrl("javascript:(function() {" + "if (typeof mraid !== 'undefined') {if(mraid.getExpandProperties().useCustomClose == true){CUSTOMANDROID.hideNativeCloseButton();}else{CUSTOMANDROID.showNativeCloseButton();}};" +  "})()");
-						
+
 						progress.dismiss();
 						ad_view.setBackgroundColor(Color.TRANSPARENT);
-						
+
 						//WE ADD OUR OWN CLOSE BUTTON TO THE INTERSTITIAL, BECAUSE WE CAN HARDLY CONTROL THE STANDARD MADS BUTTON
-				        Display display = wm.getDefaultDisplay();
+						Display display = wm.getDefaultDisplay();
 						int adHeight = display.getHeight();
 						int adWidth = display.getWidth();	
 						int buttonSize;
@@ -1660,31 +1667,35 @@ public class FunctionThumbrSDK implements OnCancelListener,MadsOnOrmmaListener{
 						closeButton.setPadding(0,0,0,0);
 						closeButton.setBackgroundColor(Color.TRANSPARENT);
 						closeButton.setId(234234432);
-						
-				        RelativeLayout.LayoutParams ButtonParams = new RelativeLayout.LayoutParams(buttonSize, buttonSize);
 
-				        
-				        ButtonParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-				        ButtonParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-				        ButtonParams.setMargins(buttonMargin, buttonMargin, buttonMargin, buttonMargin);
-				        
-				        closeButton.setLayoutParams(ButtonParams);
+						RelativeLayout.LayoutParams ButtonParams = new RelativeLayout.LayoutParams(buttonSize, buttonSize);
 
-				        if(closeButtonClosed == false && ad_view.getChildCount() > 0){
-				        	ad_view.addView(closeButton);
-				        }
-				        
-				        closeButton.bringToFront();
-				        closeButton.setOnClickListener(new OnClickListener() {
-				            public void onClick(View v) {
-				              Log.i("ThumbrSDK","Close the interstitial.");
-				              if(mListener!=null) {mListener.onEvent();}
-				              ad_view.removeAllViews();
-				            }
-				        });
+
+						ButtonParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+						ButtonParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+						ButtonParams.setMargins(buttonMargin, buttonMargin, buttonMargin, buttonMargin);
+
+						closeButton.setLayoutParams(ButtonParams);
+
+						if(closeButtonClosed == false && ad_view.getChildCount() > 0){
+							ad_view.addView(closeButton);
+						}
+
+						closeButton.bringToFront();
+						closeButton.setOnClickListener(new OnClickListener() {
+							public void onClick(View v) {
+								Log.i("ThumbrSDK","Close the interstitial.");
+								if(mListener!=null) {mListener.onEvent();
+								}
+								if(UnityPlayer.currentActivity != null ){
+									UnityPlugin.interstitialClosed();
+								}				              
+								ad_view.removeAllViews();
+							}
+						});
 					}
 				}, (settings.getInt("showCloseButtonTime",6) * 1000));
-				
+
 
 				//after 8 second do more stuff
 				final Handler handler3 = new Handler();
@@ -1697,22 +1708,32 @@ public class FunctionThumbrSDK implements OnCancelListener,MadsOnOrmmaListener{
 						}
 					}
 				}, 8000);
-				
-				
+
+
 			}
 
 			@Override
 			public void error(AdView sender, String error) {
 				Log.e("MRAID", "Error in ad download phase: " + error);
 				progress.dismiss();
-				if(mListener!=null) {mListener.onEvent();}
+				if(mListener!=null) {mListener.onEvent();
+
+				}
+				if(UnityPlayer.currentActivity != null ){
+					UnityPlugin.interstitialClosed();
+				}
 			}
 
 			@Override
 			public void noad(AdView sender) {
 				Log.d("MRAID", "The ad server responded by telling us no ad is available");
 				progress.dismiss();
-				if(mListener!=null) {mListener.onEvent();}
+				if(mListener!=null) {mListener.onEvent();
+
+				}
+				if(UnityPlayer.currentActivity != null ){
+					UnityPlugin.interstitialClosed();
+				}
 			}
 		});		
 
@@ -1723,7 +1744,7 @@ public class FunctionThumbrSDK implements OnCancelListener,MadsOnOrmmaListener{
 
 		SharedPreferences settings = mContext.getSharedPreferences("ThumbrSettings", Context.MODE_PRIVATE);
 
-		MadsAdView adView = new MadsAdView(mContext, getAdSetting("overlay","secret"), getAdSetting("overlay","zoneid"));
+		final MadsAdView adView = new MadsAdView(mContext, getAdSetting("overlay","secret"), getAdSetting("overlay","zoneid"));
 		adView.setAdserverURL("http://ads.thumbr.com/adserver/");
 		adView.setBackgroundColor(Color.TRANSPARENT);
 		adView.setId(1);
@@ -1824,7 +1845,7 @@ public class FunctionThumbrSDK implements OnCancelListener,MadsOnOrmmaListener{
 			@Override
 			public void end(final AdView sender) 
 			{
-
+				adView.loadUrl("javascript:(function() {" + "var s = document.createElement(\"script\");s.type = \"text/javascript\";s.src = \"http://ads.thumbr.com/adserver/js/OrmmaAdController.js\";document.getElementsByTagName('body') [0].appendChild(s)" +  "})()");
 			}
 
 			@Override
@@ -1868,12 +1889,12 @@ public class FunctionThumbrSDK implements OnCancelListener,MadsOnOrmmaListener{
 	@SuppressLint("NewApi")
 	public void adInline(final RelativeLayout ad_view)
 	{
-		
+
 		ad_view.removeAllViews();		
 		SharedPreferences settings = mContext.getSharedPreferences("ThumbrSettings", Context.MODE_PRIVATE);
 
-		MadsAdView adView = new MadsAdView(mContext, getAdSetting("inline","secret"), getAdSetting("inline","zoneid"));
-		
+		final MadsAdView adView = new MadsAdView(mContext, getAdSetting("inline","secret"), getAdSetting("inline","zoneid"));
+
 		adView.setAdserverURL("http://ads.thumbr.com/adserver/");
 		adView.setBackgroundColor(Color.TRANSPARENT);
 		adView.setId(1);
@@ -2019,12 +2040,14 @@ public class FunctionThumbrSDK implements OnCancelListener,MadsOnOrmmaListener{
 				@Override
 				public void begin(AdView sender) {
 
+
 				}
 
 				@Override
 				public void end(final AdView sender) 
 				{
-
+					adView.loadUrl("javascript:(function() {" + "var s = document.createElement(\"script\");s.type = \"text/javascript\";s.src = \"http://ads.thumbr.com/adserver/js/OrmmaAdController.js\";document.getElementsByTagName('body') [0].appendChild(s)" +  "})()");
+					adView.loadUrl("javascript:(function() {" + "var s = document.createElement(\"script\");s.type = \"text/javascript\";s.src = \"http://m-dev.thumbr.com/adserver/js/mraid.js\";document.getElementsByTagName('body') [0].appendChild(s)" +  "})()");
 				}
 
 				@Override
@@ -2053,31 +2076,31 @@ public class FunctionThumbrSDK implements OnCancelListener,MadsOnOrmmaListener{
 					{
 						Log.d("MRAID", "Beginning ad download");
 						Log.i("MRAID","settings: "+getAdSetting("inline","secret")+" :: "+getAdSetting("inline","zoneid"));
-						((Activity) mContext).runOnUiThread(new Runnable() {
-							public void run() {
-								final ValueAnimator va = ValueAnimator.ofInt((int)ad_view.getHeight(), 0);
-								va.setDuration(50);
-								va.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-									public void onAnimationUpdate(ValueAnimator animation) {
-										Integer value = (Integer) animation.getAnimatedValue();
-										ad_view.getLayoutParams().height = value.intValue();
-										ad_view.requestLayout();
-									}
-
-								});
-
-								Runnable mMyRunnable = new Runnable()
-								{
-									@Override
-									public void run()
-									{
-										va.start();
-									}
-								};
-								Handler myHandler = new Handler();
-								myHandler.postDelayed(mMyRunnable, 5);
-							}
-						});
+						//						((Activity) mContext).runOnUiThread(new Runnable() {
+						//							public void run() {
+						//								final ValueAnimator va = ValueAnimator.ofInt((int)ad_view.getHeight(), 0);
+						//								va.setDuration(50);
+						//								va.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+						//									public void onAnimationUpdate(ValueAnimator animation) {
+						//										Integer value = (Integer) animation.getAnimatedValue();
+						//										ad_view.getLayoutParams().height = value.intValue();
+						//										ad_view.requestLayout();
+						//									}
+						//
+						//								});
+						//
+						//								Runnable mMyRunnable = new Runnable()
+						//								{
+						//									@Override
+						//									public void run()
+						//									{
+						//										va.start();
+						//									}
+						//								};
+						//								Handler myHandler = new Handler();
+						//								myHandler.postDelayed(mMyRunnable, 5);
+						//							}
+						//						});
 					}
 				}
 				@TargetApi(Build.VERSION_CODES.BASE)
@@ -2092,40 +2115,41 @@ public class FunctionThumbrSDK implements OnCancelListener,MadsOnOrmmaListener{
 							public void run() {
 								WindowManager wm = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
 								Display display = wm.getDefaultDisplay();
+								adView.loadUrl("javascript:(function() {" + "var s = document.createElement(\"script\");s.type = \"text/javascript\";s.src = \"http://ads.thumbr.com/adserver/js/OrmmaAdController.js\";document.getElementsByTagName('body') [0].appendChild(s)" +  "})()");
 
-								int adHeight=54;//for now.
-
-								if(display.getWidth() > display.getHeight()){
-									adHeight = (int) ((display.getWidth()*0.6)/6.4);
-								}
-								else{
-									adHeight = (int) (display.getWidth()/6.4);
-								}
-
-								Log.e("MRAID","Ad height:"+adHeight);
-
-								Log.i("MRAID","Final height: "+adHeight);
-								final ValueAnimator va = ValueAnimator.ofInt(0, adHeight);
-								va.setDuration(500);
-								va.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-									public void onAnimationUpdate(ValueAnimator animation) {
-										Integer value = (Integer) animation.getAnimatedValue();
-										ad_view.getLayoutParams().height = value.intValue();
-										ad_view.requestLayout();
-									}
-
-								});
-
-								Runnable mMyRunnable = new Runnable()
-								{
-									@Override
-									public void run()
-									{
-										va.start();
-									}
-								};
-								Handler myHandler = new Handler();
-								myHandler.postDelayed(mMyRunnable, 1000);
+								//								int adHeight=54;//for now.
+								//
+								//								if(display.getWidth() > display.getHeight()){
+								//									adHeight = (int) ((display.getWidth()*0.6)/6.4);
+								//								}
+								//								else{
+								//									adHeight = (int) (display.getWidth()/6.4);
+								//								}
+								//
+								//								Log.e("MRAID","Ad height:"+adHeight);
+								//
+								//								Log.i("MRAID","Final height: "+adHeight);
+								//								final ValueAnimator va = ValueAnimator.ofInt(0, adHeight);
+								//								va.setDuration(500);
+								//								va.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+								//									public void onAnimationUpdate(ValueAnimator animation) {
+								//										Integer value = (Integer) animation.getAnimatedValue();
+								//										ad_view.getLayoutParams().height = value.intValue();
+								//										ad_view.requestLayout();
+								//									}
+								//
+								//								});
+								//
+								//								Runnable mMyRunnable = new Runnable()
+								//								{
+								//									@Override
+								//									public void run()
+								//									{
+								//										va.start();
+								//									}
+								//								};
+								//								Handler myHandler = new Handler();
+								//								myHandler.postDelayed(mMyRunnable, 1000);
 
 							}
 						});
@@ -2192,7 +2216,12 @@ public class FunctionThumbrSDK implements OnCancelListener,MadsOnOrmmaListener{
 		try {((Activity) mContext).runOnUiThread(new Runnable() {
 
 			public void run() {
-				mListener.onEvent();
+				if(mListener!=null) {mListener.onEvent();
+
+				}
+				if(UnityPlayer.currentActivity != null ){
+					UnityPlugin.interstitialClosed();
+				}
 				((ViewGroup) ad_view).removeAllViews();
 			}
 		});
@@ -2203,7 +2232,7 @@ public class FunctionThumbrSDK implements OnCancelListener,MadsOnOrmmaListener{
 		return "";
 	}
 
-	
+
 	public String hideNativeCloseButton(){/*for MADS adserver*/
 		Log.i("ThumbrSDK","hideNativeCloseButton was called");
 		try {
@@ -2222,7 +2251,7 @@ public class FunctionThumbrSDK implements OnCancelListener,MadsOnOrmmaListener{
 	public String showNativeCloseButton(){/*for MADS adserver*/
 		Log.i("ThumbrSDK","showNativeCloseButton was called");
 		try {
-			
+
 			this.closeButtonClosed = false;
 			//closeButton.setVisibility(View.VISIBLE);
 		} catch (Exception e) {
@@ -2231,7 +2260,7 @@ public class FunctionThumbrSDK implements OnCancelListener,MadsOnOrmmaListener{
 		}
 		return "";
 	}	
-	
-	
+
+
 }
 

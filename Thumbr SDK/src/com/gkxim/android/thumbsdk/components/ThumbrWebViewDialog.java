@@ -41,9 +41,12 @@ import android.widget.RelativeLayout.LayoutParams;
 
 import com.gkxim.android.thumbsdk.FunctionThumbrSDK;
 import com.gkxim.android.thumbsdk.R;
+import com.gkxim.android.thumbsdk.UnityPlugin;
 import com.gkxim.android.thumbsdk.utils.APIServer;
 import com.gkxim.android.thumbsdk.utils.ProfileObject;
 import com.gkxim.android.thumbsdk.utils.TBrLog;
+import com.unity3d.player.UnityPlayer;
+import com.unity3d.player.UnityPlayerActivity;
 
 @SuppressLint("SetJavaScriptEnabled")
 public class ThumbrWebViewDialog extends Dialog implements
@@ -122,6 +125,10 @@ android.view.View.OnClickListener {
 		public void run() {
 			// TODO Auto-generated method stub
 			ThumbrWebViewDialog.this.dismiss();
+			if(UnityPlayer.currentActivity != null ){
+				UnityPlugin unity = new UnityPlugin();
+				unity.dismiss(getProfile());
+			}
 		}
 	}
 
@@ -600,13 +607,20 @@ android.view.View.OnClickListener {
 			if(url.contains("thumbr://stop")){
 				mLoadCompleted=true;
 				if(url.contains(url_hasdcode)){
-					isLogined();
+					//isLogined();
 					///mWebView.loadUrl(APIServer.getURLPrtal());
 					//return;
 				}
 				TBrLog.lt(mContext, 0,
 						"Start Game");
+				
 				ThumbrWebViewDialog.this.dismiss();
+				if(UnityPlayer.currentActivity != null ){
+					UnityPlugin unity = new UnityPlugin();
+					unity.dismiss(getProfile());
+				}
+				
+
 				return;
 			}else if((!url.contains("10.100.101") && !url.contains("file://") && !url.contains(".colo") && !url.contains("appsdorado") && !url.contains("scoreoid") && !url.contains("appsilike.mobi") && !url.equals("null") && !url.contains("demooij.it") && !url.contains("thumbr.com") && !url.contains("cliqdigital.com")) || url.contains("openinbrowser")){
 				//Load in external browser
@@ -646,7 +660,7 @@ android.view.View.OnClickListener {
 
 					onCreateAnimation();
 					if(url.contains(url_hasdcode)){
-						isLogined();
+						//isLogined();
 						///mWebView.loadUrl(APIServer.getURLPrtal());
 						//return;
 					}
@@ -684,8 +698,13 @@ android.view.View.OnClickListener {
 			}
 		}
 
-		if(v.getId()==R.id.bottom_close){			
+		if(v.getId()==R.id.bottom_close){		
+			
 			ThumbrWebViewDialog.this.dismiss();
+			if(UnityPlayer.currentActivity != null ){
+				UnityPlugin unity = new UnityPlugin();
+				unity.dismiss(getProfile());
+			}
 			Log.i("ThumbrSDK","clicked the back button");
 		}		
 
@@ -709,6 +728,8 @@ android.view.View.OnClickListener {
 			Uri uri=Uri.parse(s);
 			if(uri.getQueryParameter("access_token") != null){
 				accToken = uri.getQueryParameter("access_token");
+				mContext.getSharedPreferences(FunctionThumbrSDK.ACCESSTOKEN,Context.MODE_PRIVATE).edit()
+				.putString(FunctionThumbrSDK.ACCESSTOKEN,uri.getQueryParameter("access_token")).commit();				
 			}
 			Log.i("ThumbrSDK","Access token: "+accToken);
 			return true;
@@ -718,6 +739,8 @@ android.view.View.OnClickListener {
 
 	}
 	public String get_AccToken(){
+		
+		accToken = mContext.getSharedPreferences(FunctionThumbrSDK.ACCESSTOKEN,Context.MODE_PRIVATE).getString(FunctionThumbrSDK.ACCESSTOKEN, "");;
 		return accToken;
 	}
 
@@ -729,7 +752,8 @@ android.view.View.OnClickListener {
 	public ProfileObject getProfile(){
 		ProfileObject obj=null;		
 		APIServer server=new APIServer(mContext);
-		obj=server.getProfile(get_AccToken());		
+		obj=server.getProfile(get_AccToken());
+		
 		return obj;	
 	}
 
@@ -753,14 +777,10 @@ android.view.View.OnClickListener {
 			Log.i("ThumbrSDK","log in succeeded with acc token: "+get_AccToken());
 			mContext.getSharedPreferences(FunctionThumbrSDK.LOGINED,Context.MODE_PRIVATE).edit()
 			.putBoolean(FunctionThumbrSDK.LOGINED,true).commit();
-			mContext.getSharedPreferences(FunctionThumbrSDK.ACCESSTOKEN,Context.MODE_PRIVATE).edit()
-			.putString(FunctionThumbrSDK.ACCESSTOKEN,get_AccToken()).commit();
 			return true;
 		}
 		mContext.getSharedPreferences(FunctionThumbrSDK.LOGINED,Context.MODE_PRIVATE).edit()
 		.putBoolean(FunctionThumbrSDK.LOGINED,false).commit();
-		mContext.getSharedPreferences(FunctionThumbrSDK.ACCESSTOKEN,Context.MODE_PRIVATE).edit()
-		.putString(FunctionThumbrSDK.ACCESSTOKEN,get_AccToken()).commit();
 		return false;
 	}
 
