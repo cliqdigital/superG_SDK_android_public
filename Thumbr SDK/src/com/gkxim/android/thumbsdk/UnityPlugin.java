@@ -1,7 +1,7 @@
 package com.gkxim.android.thumbsdk;
 
 import java.util.Locale;
-
+import com.MadsAdView.MadsAdView;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -10,6 +10,7 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.StrictMode;
 import android.util.Log;
 import android.view.Display;
@@ -91,7 +92,6 @@ public class UnityPlugin extends UnityPlayerActivity implements OnInterstitialCl
 		thumbr.setAction(action);
 		thumbr.setLinkRegister(registerUrl+"response_type=token&country="+country+"&locale="+locale+"&sid="+sid+"&client_id="+client_id+"&handset_id="+appsFlyerId);			
 		thumbr.adInit();//initialize Ads if you are showing Thumbr Ads    
-
 
 	}
 
@@ -195,32 +195,37 @@ public class UnityPlugin extends UnityPlayerActivity implements OnInterstitialCl
 	}	
 
 	public static void superG_AdOverlay(){
+
 		UnityPlayer.currentActivity.runOnUiThread(new Runnable() {
 			public void run() {
 				UnityPlugin.setAdSettings();
-				RelativeLayout av = (RelativeLayout) UnityPlayer.currentActivity.findViewById(77665544);
-
+				LinearLayout av2 = (LinearLayout) UnityPlayer.currentActivity.findViewById(77665544);
+				View av = (MadsAdView) UnityPlayer.currentActivity.findViewById(11223344);
 				try {
 					((ViewGroup) av.getParent()).removeView(av);
+					((ViewGroup) av.getParent()).removeView(av2);
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-
+				LinearLayout ad_view_wrapper = new LinearLayout(UnityPlayer.currentActivity);
 				RelativeLayout ad_view = new RelativeLayout(UnityPlayer.currentActivity);
-				ad_view.setId(77665544);
-				RelativeLayout.LayoutParams rlp = new RelativeLayout.LayoutParams(
-						RelativeLayout.LayoutParams.FILL_PARENT,
-						RelativeLayout.LayoutParams.FILL_PARENT);
-				rlp.addRule(RelativeLayout.CENTER_IN_PARENT);
+
+				ad_view_wrapper.setId(77665544);
+				LayoutParams rlp = new RelativeLayout.LayoutParams(
+						LinearLayout.LayoutParams.FILL_PARENT,
+						LinearLayout.LayoutParams.FILL_PARENT);
+				WindowManager wm = (WindowManager) UnityPlayer.currentActivity.getSystemService(Context.WINDOW_SERVICE);
 
 				thumbr=new FunctionThumbrSDK(UnityPlayer.currentActivity, 2);	
-				UnityPlayer.currentActivity.addContentView(ad_view, rlp);
+				ad_view_wrapper.addView(ad_view);
+				UnityPlayer.currentActivity.addContentView(ad_view_wrapper, rlp);
+
 				thumbr.adOverlay(ad_view);
 
 			}
 		});
-	}
+	}	
 
 	public static void superG_AdInline(int x,int y,int w,int h){
 		final int xValue=x;
@@ -280,10 +285,62 @@ public class UnityPlugin extends UnityPlayerActivity implements OnInterstitialCl
 				thumbr=new FunctionThumbrSDK(UnityPlayer.currentActivity, 2);	
 				((ViewGroup) topview).addView(ad_view);
 				thumbr.adInterstitial(ad_view);
-				
+
+			}
+		});
+
+	}	
+
+	public static void superG_RemoveAdInterstitial(){
+		UnityPlayer.currentActivity.runOnUiThread(new Runnable() {
+			public void run() {
+				final View av = (MadsAdView) UnityPlayer.currentActivity.findViewById(9875737);
+				final View av2 = (RelativeLayout) UnityPlayer.currentActivity.findViewById(88776655);
+
+
+				try {
+					((ViewGroup) av.getParent()).removeView(av);
+					((ViewGroup) av2.getParent()).removeView(av);	
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		});
 	}	
+
+	public static void superG_RemoveAdOverlay(){
+		UnityPlayer.currentActivity.runOnUiThread(new Runnable() {
+			public void run() {
+				View av = (MadsAdView) UnityPlayer.currentActivity.findViewById(11223344);
+				View av2 = (LinearLayout) UnityPlayer.currentActivity.findViewById(77665544);
+				try {
+					((ViewGroup) av.getParent()).removeView(av);
+					((ViewGroup) av.getParent()).removeView(av2);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		});
+	}	
+
+	public static void superG_RemoveAdInline(){
+		UnityPlayer.currentActivity.runOnUiThread(new Runnable() {
+			public void run() {
+				View av = (LinearLayout) UnityPlayer.currentActivity.findViewById(99887766);
+
+				try {
+					((ViewGroup) av.getParent()).removeView(av);
+
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
 
 	@Override
 	protected void onPause() {
@@ -316,7 +373,7 @@ public class UnityPlugin extends UnityPlayerActivity implements OnInterstitialCl
 	@Override
 	public void onEvent() {
 		// TODO Auto-generated method stub
-		
+
 	} 
 
 

@@ -160,8 +160,7 @@ public class ThumbrSDKTest extends Activity implements OnClickListener,OnDismiss
 		thumbr.setLinkRegister(registerUrl+"response_type=token&country="+country+"&locale="+locale+"&sid="+sid+"&client_id="+client_id+"&handset_id="+appsFlyerId);			
 		thumbr.adInit();//initialize Ads if you are showing Thumbr Ads
 
-		EVA eva = new EVA();
-		eva.installation();
+
 		
 		if( FunctionThumbrSDK.isTabletDevice(this) == true) {
 			//this is a tablet

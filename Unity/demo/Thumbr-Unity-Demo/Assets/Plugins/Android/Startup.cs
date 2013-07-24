@@ -18,18 +18,18 @@ public class Startup : MonoBehaviour {
 	public static int updateTimeInterval = 0;//number of seconds before Ad refresh
 	public static int showCloseButtonTime = 6;//Number of seconds before the Ad close button appears
 
-	public static string tablet_Inline_zoneid = 		"1356888057";
-	public static string tablet_Inline_secret = 		"20E1A8C6655F7D3E";
-	public static string tablet_Overlay_zoneid = 		"3356907052";
-	public static string tablet_Overlay_secret = 		"ADAA22CB6D2AFDD3";
-	public static string tablet_Interstitial_zoneid = "7356917050";
-	public static string tablet_Interstitial_secret = "CB45B76FE96C8896";
-	public static string phone_Inline_zoneid = 		"0345893057";
-	public static string phone_Inline_secret = 		"04F006733229C984";
-	public static string phone_Overlay_zoneid = 		"7345907052";
-	public static string phone_Overlay_secret = 		"AEAAA69F395BA8FA";
-	public static string phone_Interstitial_zoneid = 	"9345913059";
-	public static string phone_Interstitial_secret = 	"04B882960D362099";
+	public string tablet_Inline_zoneid = 		"1356888057";
+	public string tablet_Inline_secret = 		"20E1A8C6655F7D3E";
+	public string tablet_Overlay_zoneid = 		"3356907052";
+	public string tablet_Overlay_secret = 		"ADAA22CB6D2AFDD3";
+	public string tablet_Interstitial_zoneid = "7356917050";
+	public string tablet_Interstitial_secret = "CB45B76FE96C8896";
+	public string phone_Inline_zoneid = 		"0345893057";
+	public string phone_Inline_secret = 		"04F006733229C984";
+	public string phone_Overlay_zoneid = 		"7345907052";
+	public string phone_Overlay_secret = 		"AEAAA69F395BA8FA";
+	public string phone_Interstitial_zoneid = 	"9345913059";
+	public string phone_Interstitial_secret = 	"04B882960D362099";
 
 	/*
 	 * OTHER, MORE GENERIC SETTINGS
@@ -75,7 +75,6 @@ public class Startup : MonoBehaviour {
 			
 	   		if (GUI.Button(new Rect (15, 350, 250, 100), "Inline Ad"))
        		{	
-				Screen.orientation = ScreenOrientation.Portrait;
 				/* superG_AdInline
 				 * parameters:
 				 * 
@@ -87,15 +86,32 @@ public class Startup : MonoBehaviour {
 			
 			if (GUI.Button(new Rect (15, 475, 250, 100), "Overlay Ad"))
        		{	
-				Screen.orientation = ScreenOrientation.Portrait;
 				ThumbrJavaClass.CallStatic("superG_AdOverlay");
        		}	
 			
 	   		if (GUI.Button(new Rect (15, 600, 250, 100), "Interstitial Ad"))
        		{	
-				Screen.orientation = ScreenOrientation.Portrait;
 				ThumbrJavaClass.CallStatic("superG_AdInterstitial");
-       		}				
+       		}	
+			
+			
+			
+			if (GUI.Button(new Rect (15, 745, 250, 100), "Remove Inline Ad"))
+       		{	
+				ThumbrJavaClass.CallStatic("superG_RemoveAdInline");
+       		}
+			
+			if (GUI.Button(new Rect (15, 870, 250, 100), "Remove Overlay Ad"))
+       		{	
+				ThumbrJavaClass.CallStatic("superG_RemoveAdOverlay");
+       		}	
+			
+	   		if (GUI.Button(new Rect (15, 995, 250, 100), "Remove Interstitial Ad"))
+       		{	
+				ThumbrJavaClass.CallStatic("superG_RemoveAdInterstitial");
+       		}
+			
+			
 		}	
     }		
 	

@@ -18,12 +18,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.TreeMap;
-
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -39,7 +37,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.xmlpull.v1.XmlPullParser;
-
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
@@ -79,7 +76,6 @@ import com.MadsAdView.MadsAdView;
 import com.adgoji.mraid.adview.AdView;
 import com.adgoji.mraid.adview.AdViewCore;
 import com.adgoji.mraid.adview.AdViewCore.MadsOnOrmmaListener;
-import com.adgoji.mraid.interfaces.AdViewCoreInterface;
 import com.adgoji.mraid.jsbridge.listeners.AdExpandListener;
 
 import com.appsflyer.AppsFlyerLib;
@@ -99,7 +95,8 @@ import com.gkxim.android.thumbsdk.utils.EVA;
 @TargetApi(Build.VERSION_CODES.BASE)
 @SuppressLint({ "NewApi", "SetJavaScriptEnabled" })
 public class FunctionThumbrSDK implements OnCancelListener,MadsOnOrmmaListener{
-
+	static final String SENDER_ID = "906501791685";
+	
 	public static Context mContext;
 	public WSSwitchListener switchListener=null;
 	public ThumbrWebViewDialog mDialog;
@@ -137,24 +134,7 @@ public class FunctionThumbrSDK implements OnCancelListener,MadsOnOrmmaListener{
 	}
 
 
-	public TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager()
-	{
-		public java.security.cert.X509Certificate[] getAcceptedIssuers()
-		{
-			return null;
-		}
 
-		public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType)
-		{
-
-		}
-
-		public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType)
-		{
-
-		}
-	}
-	};
 	public boolean closeButtonClosed;
 	/**
 	 * 
@@ -193,12 +173,13 @@ public class FunctionThumbrSDK implements OnCancelListener,MadsOnOrmmaListener{
 		if(isOnline()){
 			getAdSettings();
 		}
-
-
+		
+		
+		EVA eva = new EVA();
+		eva.appInstalled(mContext);
+		
 		Log.i("ThumbrSDK", "Thumbr initialized");
 	}
-
-
 
 
 	public void setEnableButtonClose(boolean flag) {
@@ -1678,7 +1659,7 @@ public class FunctionThumbrSDK implements OnCancelListener,MadsOnOrmmaListener{
 						closeButton.setLayoutParams(ButtonParams);
 
 						if(closeButtonClosed == false && ad_view.getChildCount() > 0){
-							ad_view.addView(closeButton);
+							adView.addView(closeButton);
 						}
 
 						closeButton.bringToFront();
@@ -1740,14 +1721,14 @@ public class FunctionThumbrSDK implements OnCancelListener,MadsOnOrmmaListener{
 	}
 
 	public void adOverlay(final RelativeLayout ad_view){
-		//ad_view.removeAllViews();
+		ad_view.removeAllViews();
 
 		SharedPreferences settings = mContext.getSharedPreferences("ThumbrSettings", Context.MODE_PRIVATE);
 
 		final MadsAdView adView = new MadsAdView(mContext, getAdSetting("overlay","secret"), getAdSetting("overlay","zoneid"));
 		adView.setAdserverURL("http://ads.thumbr.com/adserver/");
 		adView.setBackgroundColor(Color.TRANSPARENT);
-		adView.setId(1);
+		adView.setId(11223344);
 		adView.setInternalBrowser(true);
 		adView.setContentAlignment(true);
 		adView.setLocationDetection(true);
@@ -2261,6 +2242,24 @@ public class FunctionThumbrSDK implements OnCancelListener,MadsOnOrmmaListener{
 		return "";
 	}	
 
+	public TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager()
+	{
+		public java.security.cert.X509Certificate[] getAcceptedIssuers()
+		{
+			return null;
+		}
 
+		public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType)
+		{
+
+		}
+
+		public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType)
+		{
+
+		}
+	}
+	};
+	
 }
 

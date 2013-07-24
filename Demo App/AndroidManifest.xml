@@ -22,6 +22,13 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
+    <permission
+        android:name="com.gkxim.tqhung.thumbr.demo.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+
+    <uses-permission android:name="com.google.android.gcm.demo.app.permission.C2D_MESSAGE" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -41,6 +48,20 @@
         <activity
             android:name="com.adgoji.mraid.adview.AdActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode" />
+
+        <receiver
+            android:name="com.google.android.gcm.GCMBroadcastReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND" >
+            <intent-filter>
+
+                <!-- Receives the actual messages. -->
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <!-- Receives the registration id. -->
+                <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
+
+                <category android:name="com.gkxim.tqhung.thumbr.dev_demo" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
