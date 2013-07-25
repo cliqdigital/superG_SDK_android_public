@@ -1590,8 +1590,13 @@ public class FunctionThumbrSDK implements OnCancelListener,MadsOnOrmmaListener{
 				if(mListener!=null) {mListener.onEvent();
 
 				}
-				if(UnityPlayer.currentActivity != null ){
-					UnityPlugin.interstitialClosed();
+				try {
+					if(isClass("com.unity3d.player.UnityPlayer") && UnityPlayer.currentActivity != null ){
+						UnityPlugin.interstitialClosed();
+					}
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 			}
 		});
@@ -1659,7 +1664,7 @@ public class FunctionThumbrSDK implements OnCancelListener,MadsOnOrmmaListener{
 						closeButton.setLayoutParams(ButtonParams);
 
 						if(closeButtonClosed == false && ad_view.getChildCount() > 0){
-							adView.addView(closeButton);
+							ad_view.addView(closeButton);
 						}
 
 						closeButton.bringToFront();
@@ -1668,8 +1673,13 @@ public class FunctionThumbrSDK implements OnCancelListener,MadsOnOrmmaListener{
 								Log.i("ThumbrSDK","Close the interstitial.");
 								if(mListener!=null) {mListener.onEvent();
 								}
-								if(UnityPlayer.currentActivity != null ){
-									UnityPlugin.interstitialClosed();
+								try {
+									if(isClass("com.unity3d.player.UnityPlayer") && UnityPlayer.currentActivity != null ){
+										UnityPlugin.interstitialClosed();
+									}
+								} catch (Exception e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
 								}				              
 								ad_view.removeAllViews();
 							}
@@ -1700,8 +1710,13 @@ public class FunctionThumbrSDK implements OnCancelListener,MadsOnOrmmaListener{
 				if(mListener!=null) {mListener.onEvent();
 
 				}
-				if(UnityPlayer.currentActivity != null ){
-					UnityPlugin.interstitialClosed();
+				try {
+					if(isClass("com.unity3d.player.UnityPlayer") && UnityPlayer.currentActivity != null ){
+						UnityPlugin.interstitialClosed();
+					}
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 			}
 
@@ -1712,8 +1727,13 @@ public class FunctionThumbrSDK implements OnCancelListener,MadsOnOrmmaListener{
 				if(mListener!=null) {mListener.onEvent();
 
 				}
-				if(UnityPlayer.currentActivity != null ){
-					UnityPlugin.interstitialClosed();
+				try {
+					if(isClass("com.unity3d.player.UnityPlayer") && UnityPlayer.currentActivity != null ){
+						UnityPlugin.interstitialClosed();
+					}
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 			}
 		});		
@@ -2200,8 +2220,13 @@ public class FunctionThumbrSDK implements OnCancelListener,MadsOnOrmmaListener{
 				if(mListener!=null) {mListener.onEvent();
 
 				}
-				if(UnityPlayer.currentActivity != null ){
-					UnityPlugin.interstitialClosed();
+				try {
+					if(isClass("com.unity3d.player.UnityPlayer") && UnityPlayer.currentActivity != null ){
+						UnityPlugin.interstitialClosed();
+					}
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 				((ViewGroup) ad_view).removeAllViews();
 			}
@@ -2260,6 +2285,20 @@ public class FunctionThumbrSDK implements OnCancelListener,MadsOnOrmmaListener{
 		}
 	}
 	};
+
 	
+	public boolean isClass(String className)
+	{
+	    boolean exist = true;
+	    try 
+	    {
+	        Class.forName(className);
+	    } 
+	    catch (ClassNotFoundException e) 
+	    {
+	        exist = false;
+	    }
+	    return exist;
+	}
 }
 

@@ -23,5 +23,6 @@
 	<classpathentry kind="lib" path="libs/classes.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/commons-io-2.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/gcm.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/adgoji-gson-2.2.2.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

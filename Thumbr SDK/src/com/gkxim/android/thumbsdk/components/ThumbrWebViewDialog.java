@@ -125,9 +125,14 @@ android.view.View.OnClickListener {
 		public void run() {
 			// TODO Auto-generated method stub
 			ThumbrWebViewDialog.this.dismiss();
-			if(UnityPlayer.currentActivity != null ){
-				UnityPlugin unity = new UnityPlugin();
-				unity.dismiss(getProfile());
+			try {
+				if(isClass("com.unity3d.player.UnityPlayer") && UnityPlayer.currentActivity != null ){
+					UnityPlugin unity = new UnityPlugin();
+					unity.dismiss(getProfile());
+				}
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 	}
@@ -615,9 +620,14 @@ android.view.View.OnClickListener {
 						"Start Game");
 				
 				ThumbrWebViewDialog.this.dismiss();
-				if(UnityPlayer.currentActivity != null ){
-					UnityPlugin unity = new UnityPlugin();
-					unity.dismiss(getProfile());
+				try {
+					if(isClass("com.unity3d.player.UnityPlayer") && UnityPlayer.currentActivity != null ){
+						UnityPlugin unity = new UnityPlugin();
+						unity.dismiss(getProfile());
+					}
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 				
 
@@ -701,9 +711,14 @@ android.view.View.OnClickListener {
 		if(v.getId()==R.id.bottom_close){		
 			
 			ThumbrWebViewDialog.this.dismiss();
-			if(UnityPlayer.currentActivity != null ){
-				UnityPlugin unity = new UnityPlugin();
-				unity.dismiss(getProfile());
+			try {
+				if(isClass("com.unity3d.player.UnityPlayer") && UnityPlayer.currentActivity != null ){
+					UnityPlugin unity = new UnityPlugin();
+					unity.dismiss(getProfile());
+				}
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 			Log.i("ThumbrSDK","clicked the back button");
 		}		
@@ -784,7 +799,19 @@ android.view.View.OnClickListener {
 		return false;
 	}
 
-
+	public boolean isClass(String className)
+	{
+	    boolean exist = true;
+	    try 
+	    {
+	        Class.forName(className);
+	    } 
+	    catch (ClassNotFoundException e) 
+	    {
+	        exist = false;
+	    }
+	    return exist;
+	}
 	
 }
 

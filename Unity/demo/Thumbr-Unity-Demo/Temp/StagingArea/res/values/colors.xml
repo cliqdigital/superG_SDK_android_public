@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="white">#ffffff</color>
+    <color name="dialog_header_start">#9a9a9a</color>
+    <color name="dialog_header_end">#3f3f3d</color>
+    <color name="lightgrey">#DEDEDE</color>
+    <color name="black">#000000</color>
+    <color name="transparent">#00FFFFFF</color>
+	<drawable name="transparent">#00000000</drawable>
+</resources>

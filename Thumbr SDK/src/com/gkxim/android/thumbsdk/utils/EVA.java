@@ -11,6 +11,11 @@ import java.util.Random;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
+import android.location.Address;
+import android.location.Criteria;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Build;
 import android.provider.Settings.Secure;
 import android.telephony.TelephonyManager;
@@ -40,12 +45,91 @@ public class EVA {
 			settings.edit().putString("action", "launched").commit();		
 		}
 		detectInstalledApplications(context);
-		getInstalledApplications(context);
+		//gatherLocation(context);
 		
 	}
 
-
+	public void achievementEarned(Context context,String id){
+		
+	}
+	
+	public void applicationGetFocus(Context context,String id){
+		
+	}
+	
+	public void click(Context context,String id){
+		
+	}
+	
+	public void finishLevel(Context context,String id){
+		
+	}
+	
+	public void purchase(Context context,String id){
+		
+	}
+	
+	public void startLevel(Context context,String id){
+		
+	}
+	
+	public void upSell(Context context,String id){
+		
+	}
+	
 	//PRIVATE FUNCTIONS
+	
+	private void gatherLocation(Context context){
+		 Geocoder geocoder;
+	     String bestProvider;
+	     List<Address> user = null;
+	     String latitude = null;
+	     String longitude = null;
+
+	    LocationManager lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+
+	     Criteria criteria = new Criteria();
+	     bestProvider = lm.getBestProvider(criteria, false);
+	     Location location = lm.getLastKnownLocation(bestProvider);
+
+	     if (location == null){
+	    	 Log.i("ThumbrSDK","location not found");
+	      }else{
+	        geocoder = new Geocoder(context);
+	        try {
+	            user = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+	        latitude=String.valueOf((double)user.get(0).getLatitude());
+	        longitude=String.valueOf((double)user.get(0).getLongitude());
+	        }catch (Exception e) {
+	                e.printStackTrace();
+	        }
+	    }
+	     
+		if(longitude != null && latitude != null){
+			SharedPreferences settings = context.getSharedPreferences("ThumbrSettings", Context.MODE_PRIVATE);
+			settings.edit().putString("longitude", longitude).commit();
+			settings.edit().putString("latitude", latitude).commit();
+		}
+		Log.i("ThumbrSDK","longitude: "+getLongitude(context));
+		Log.i("ThumbrSDK","latitude: "+getLatitude(context));		
+	}
+	
+	private String getLongitude(Context context){
+		SharedPreferences settings = context.getSharedPreferences("ThumbrSettings", Context.MODE_PRIVATE);
+		String longitude = settings.getString("longitude","");		
+		return longitude;
+	}
+	
+	private String getLatitude(Context context){
+		SharedPreferences settings = context.getSharedPreferences("ThumbrSettings", Context.MODE_PRIVATE);
+		String latitude = settings.getString("latitude","");		
+		return latitude;
+	}
+	
+	private String getPreviousSessionTime(Context context){
+		return "";
+	}
+	
 	private String getDate(){ 
 		Date currentTime = new Date();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss z");
@@ -58,7 +142,7 @@ public class EVA {
 		return sdf.format(currentTime);
 	}
 
-	private void saveEvent(Context context, String name,List bagged){
+	private void saveEvent(Context context, String name,List bagged,String event_key, String event_value){
 		DatabaseHandler db = new DatabaseHandler(context );		
 	}
 
