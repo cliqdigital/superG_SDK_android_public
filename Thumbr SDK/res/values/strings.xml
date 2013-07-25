@@ -15,7 +15,7 @@
     <!-- French -->
     <string name="msg_German">Kann nicht auf Internet zu verbinden.\nBitte überprüfen Sie Ihre Verbindungseinstellungen und versuchen Sie es erneut</string>
     <string name="German">de</string>
-    <string name="versionName">2.0.32</string>
+    <string name="versionName">2.0.33</string>
     <string name="appsilike_title">appsilike message:</string>
     <string name="_0dp">0dp</string>
 
