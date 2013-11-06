@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/glass"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_gravity="center_horizontal" >
+
+        <LinearLayout
+            android:id="@+id/linearLayout1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_centerVertical="true" >
+
+            <Button
+                android:id="@+id/inline"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/_10dp"
+                android:text="Inline Ad"
+                android:textSize="15sp" />
+
+            <Button
+                android:id="@+id/overlay"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="6sp"
+                android:layout_marginRight="6sp"
+                android:layout_weight="1"
+                android:padding="@dimen/_10dp"
+                android:text="Overlay Ad"
+                android:textSize="15sp" />
+
+            <Button
+                android:id="@+id/interstitial"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="@dimen/_10dp"
+                android:text="Interstitial Ad"
+                android:textSize="15sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linearLayout2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textView3"
+            android:layout_centerHorizontal="true"
+            android:minHeight="50dp"
+            android:minWidth="50dp"
+            android:orientation="horizontal" >
+
+            <ImageButton
+                android:id="@+id/bt_re"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/transparent"
+                android:tag="ThumbrLogo"
+                android:text="Register" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentTop="false"
+            android:layout_centerInParent="true"
+            android:text="Thumbr SDK demo"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/lightgrey" />
+
+        <RelativeLayout
+            android:id="@+id/ad_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="false"
+            android:layout_alignParentTop="true"
+            android:layout_centerInParent="true"
+            android:layout_gravity="bottom"
+            android:background="@color/transparent" >
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/linearLayout1"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="@dimen/_10dp"
+            android:layout_marginTop="@dimen/_10dp"
+            android:text="Advertisement actions"
+            android:textColor="@color/white" />
+
+        <TextView
+            android:id="@+id/TextView01"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/LinearLayout01a"
+            android:layout_centerInParent="true"
+            android:layout_marginBottom="@dimen/_10dp"
+            android:text="Event logging actions"
+            android:textColor="@color/white" />
+
+        <LinearLayout
+            android:id="@+id/LinearLayout01a"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/LinearLayout01b"
+            android:layout_alignLeft="@+id/linearLayout1"
+            android:layout_alignRight="@+id/linearLayout1" >
+
+            <Button
+                android:id="@+id/achievement"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="6sp"
+                android:text="Achievement"
+                android:textSize="@dimen/_10dp" />
+
+            <Button
+                android:id="@+id/click"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="6sp"
+                android:layout_marginRight="6sp"
+                android:layout_weight="0.57"
+                android:padding="6sp"
+                android:text="Click"
+                android:textSize="@dimen/_10dp" />
+
+            <Button
+                android:id="@+id/purchase"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="6sp"
+                android:text="Purchase"
+                android:textSize="@dimen/_10dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/LinearLayout01b"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/textView2"
+            android:layout_alignLeft="@+id/LinearLayout01a"
+            android:layout_alignRight="@+id/LinearLayout01a"
+            android:layout_marginTop="6sp" >
+
+            <Button
+                android:id="@+id/start_level"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="6sp"
+                android:text="Start Level"
+                android:textSize="@dimen/_10dp" />
+
+            <Button
+                android:id="@+id/finish_level"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="6sp"
+                android:layout_marginRight="6sp"
+                android:padding="6sp"
+                android:paddingLeft="6sp"
+                android:text="Finish Level"
+                android:textSize="@dimen/_10dp" />
+
+            <Button
+                android:id="@+id/up_sell"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="6sp"
+                android:text="UpSell"
+                android:textSize="@dimen/_10dp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/linearLayout1"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="@dimen/_10dp"
+            android:layout_marginTop="@dimen/_10dp"
+            android:text="Thumbr registration"
+            android:textColor="@color/white" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/ad_view_interstitial"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@color/transparent" >
+    </RelativeLayout>
+
+</FrameLayout>

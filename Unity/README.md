@@ -18,18 +18,30 @@ Integration guide
 * Edit the Startup.cs file to suit your needs.
 #####Please note: The settings in the Startup.cs will have to be replaced by the settings, given to you by your game manager.
 
+### Step 4
+ANdroid manifest!±
+
+
 ##Methods
-There are 4 interactive methods:
+There are several interactive methods:
 
-* ThumbrJavaClass.CallStatic("superG_OpenDialog",this);
+Open the superG dialog for user registration:
 
-This will open the superG dialog for user registration
+* 	*ThumbrJavaClass.CallStatic("superG_OpenDialog",this);*
 
-* ThumbrJavaClass.CallStatic("superG_AdInline",x,y,width,height);
-This will open an 'inline ad banner'
+Call different ad types:
 
-* ThumbrJavaClass.CallStatic("superG_AdOverlay");
-This will open an 'overlay banner'
+* 	*ThumbrJavaClass.CallStatic("superG_AdInline",x,y,width,height);*
 
-* ThumbrJavaClass.CallStatic("superG_AdInterstitial");
-This will open a page screen filling 'interstitial banner'
+	This will open an 'inline ad banner'
+
+* 	*ThumbrJavaClass.CallStatic("superG_AdOverlay");*
+
+	This will open an 'overlay banner'
+
+* 	*ThumbrJavaClass.CallStatic("superG_AdInterstitial");*
+
+	This will open a page screen filling 'interstitial banner'
+	
+Log different event types:
+
