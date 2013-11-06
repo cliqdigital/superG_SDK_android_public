@@ -6,7 +6,13 @@ Revision history
 ----------------
 <table>
 	<tr>
+	<td style="font-weight: bold;">Version</td>
+	<td style="font-weight: bold;min-width: 80px;">Date</td>
+	<td style="font-weight: bold;">Changes</td>
+	</tr>
+	<tr>
 		<td>3.0.0</td>
+		<td>2013-11-06</td>		
 		<td>
 		-Rebranded to SuperG<br />
 		-Event logging<br />
@@ -18,6 +24,7 @@ Revision history
 	</tr>
 	<tr>
 		<td>2.0.32</td>
+		<td>2013-07-25</td>
 		<td>
 		-Possibility to hide the Thumbr close button (remote configuration)<br />
 		-Improved interstitial ads<br />
@@ -26,6 +33,7 @@ Revision history
 	</tr>
 	<tr>
 		<td>2.0.31</td>
+		<td>2013-05-16</td>
 		<td>
 		-Personalized Ad serving support<br />
 		-Technical updates
@@ -33,6 +41,7 @@ Revision history
 	</tr>
 	<tr>
 		<td>2.0.3</td>
+		<td>2013-04-29</td>
 		<td>
 			-Ad serving support<br />
 			-Added SSL support<br />
@@ -41,6 +50,7 @@ Revision history
 	</tr>
 	<tr>
 		<td>2.0.22</td>
+		<td>2013-03-22</td>
 		<td>
 		-Added support for alternative layout<br />
 		-Catch url's that contain 'openinbrowser' and open them in browser<br />
@@ -49,7 +59,9 @@ Revision history
 		</td>
 	</tr>
 	<tr>
-		<td>2.0.21</td><td>
+		<td>2.0.21</td>
+		<td>2013-01-24</td>
+		<td>
 		-Better Thumbr T-button resizing<br />
 		-Added visual SDK version to Thumbr window<br />
 		-Added Customizable Orientation<br />
@@ -62,7 +74,9 @@ Revision history
 		</td>
 	</tr>
 	<tr>
-		<td>2.0.2</td><td>
+		<td>2.0.2</td>
+		<td></td>
+		<td>
 		-Updated version number to match iOS version (for better release planning)<br />
 		-Added Animated Thumbr T-button support<br />
 		-Added SDK version number to Thumbr screen<br />
@@ -70,17 +84,23 @@ Revision history
 		</td>
 	</tr>	
 	<tr>
-		<td>1.1</td><td>
+		<td>1.1</td>
+		<td></td>
+		<td>
 		- Added Appsflyer support
 		</td>
 	</tr>	
 	<tr>
-		<td>1.0.1</td><td>
+		<td>1.0.1</td>
+		<td></td>
+		<td>
 		- Bug fixes
 		</td>
 	</tr>	
 	<tr>
-		<td>1.0</td><td>
+		<td>1.0</td>
+		<td></td>
+		<td>
 		- Initital version
 		</td>
 	</tr>	
