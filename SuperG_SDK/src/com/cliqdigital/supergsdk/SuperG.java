@@ -1061,7 +1061,7 @@ public class SuperG implements OnCancelListener,MadsOnOrmmaListener{
 
 		final MadsAdView adView = new MadsAdView(mContext, getAdSetting("overlay","secret"), getAdSetting("overlay","zoneid"));
 		adView.setAdserverURL("http://ads.superg.mobi/adserver/");
-		adView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+//		adView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
 		adView.setBackgroundColor(Color.TRANSPARENT);
 		adView.setId(11223344);
 		adView.setInternalBrowser(true);
@@ -1214,7 +1214,7 @@ public class SuperG implements OnCancelListener,MadsOnOrmmaListener{
 		final MadsAdView adView = new MadsAdView(mContext, getAdSetting("inline","secret"), getAdSetting("inline","zoneid"));
 
 		adView.setAdserverURL("http://ads.superg.mobi/adserver/");
-		adView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+//		adView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
 		adView.setBackgroundColor(Color.TRANSPARENT);
 		adView.setId(1);
 		adView.setInternalBrowser(true);
