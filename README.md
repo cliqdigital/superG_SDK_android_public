@@ -11,6 +11,13 @@ Revision history
 	<td style="font-weight: bold;">Changes</td>
 	</tr>
 	<tr>
+		<td>3.0.1</td>
+		<td>2013-11-12</td>		
+		<td>-Bugfix hardware acceleration (API 11)<br />
+		-Bugfix non-standard timezone strings.
+		</td>
+	</tr>
+	<tr>
 		<td>3.0.0</td>
 		<td>2013-11-06</td>		
 		<td>

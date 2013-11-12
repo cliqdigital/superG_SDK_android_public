@@ -351,7 +351,7 @@ public class EVA {
 
 	private String getDate(){ 
 		Date currentTime = new Date();
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss z");
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 		return sdf.format(currentTime);
 	}
 
