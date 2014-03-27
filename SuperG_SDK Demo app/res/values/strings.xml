@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-
-    <string name="hello">Hello World, DemoThumbrActivity!</string>
-    <string name="DemoAppTitle">SuperG developer DEMO</string>
-    <string name="app_name">SuperG</string>
-    <string name="appsilikeDemoAppTitle">SuperG integration demo</string>
-	<string name="sansseriflight">sans-serif-light</string>
-</resources>
