@@ -360,6 +360,14 @@ Upsell event
 	//example:
 	eva.upSell(this, "EUR", "in-app-purchase");
 
+###Optional 2: installation_id => server
+If you are using a back end that triggers events that are used by SuperG Push messaging, you need to pass the installation_id.
+You can obtain the installation_id like this:
+
+	EVA eva = new EVA();
+	eva.getInstallationId(context);
+
+
 ###Proguard
 
 Add these lines to your Proguard configuration:
